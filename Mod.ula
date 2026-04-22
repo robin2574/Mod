@@ -1,0 +1,1255 @@
+-- ========== CASE FARM ROBINA + BATTLES + FULL MOD MENU ==========
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local Events = ReplicatedStorage:WaitForChild("Events")
+
+-- ========== НАСТРОЙКИ ==========
+local OpenAmount = 10
+local AutoSell = false
+local Farming = false
+local FarmDelay = 0.01
+
+-- ID создателя
+local CREATOR_ID = 9988144824
+local CREATOR_NAME = "TROTULOV39"
+
+-- ========== ЦЕНЫ НА КЕЙСЫ ==========
+local CasePrices = {
+    ["Trash"] = 0, ["Daily"] = 0, ["Beggar"] = 220, ["Plodder"] = 444,
+    ["Office Clerk"] = 689, ["Manager"] = 835, ["Director"] = 926,
+    ["Oligarch"] = 1364, ["Gold"] = 1999, ["Frozen Heart"] = 4500,
+    ["Dark"] = 4999, ["Bubble Gum"] = 12000, ["Palm"] = 13999,
+    ["Burj"] = 37999, ["Cats"] = 40000, ["M5 F90"] = 55555,
+    ["Luxury"] = 119999, ["Glitch"] = 135000, ["G63"] = 177777,
+    ["Dream"] = 250000, ["Porsche 911"] = 599999, ["URUS"] = 1666666,
+    ["Bloody Night"] = 5000000, ["Marina"] = 12999999, ["Abyss Core"] = 33000000,
+    ["Cursed Demon"] = 36666666, ["Heavenfall"] = 64000000, ["Photon Core"] = 43333,
+    ["Divine"] = 500000, ["Sunny Day"] = 1000, ["Radioactive"] = 31111111
+}
+
+local Cases = {
+    "Trash", "Daily", "Beggar", "Plodder", "Office Clerk", "Manager",
+    "Director", "Oligarch", "Gold", "Frozen Heart", "Dark", "Bubble Gum",
+    "Palm", "Burj", "Cats", "M5 F90", "Luxury", "Glitch", "G63", "Dream",
+    "Porsche 911", "URUS", "Bloody Night", "Marina", "Abyss Core",
+    "Cursed Demon", "Heavenfall", "Photon Core", "Divine", "Sunny Day",
+    "Radioactive"
+}
+
+local CustomCases = {}
+for i, v in ipairs(Cases) do table.insert(CustomCases, v) end
+local SelectedCases = {"Heavenfall"}
+
+local function getAvatar(userId)
+    return "https://www.roblox.com/headshot-thumbnail/image?userId=" .. userId .. "&width=100&height=100&format=png"
+end
+
+-- ========== ГЛАВНОЕ МЕНЮ ==========
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "CaseFarmRobina"
+ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(20, 25, 10)
+MainFrame.BackgroundTransparency = 0.05
+MainFrame.BorderColor3 = Color3.fromRGB(150, 255, 100)
+MainFrame.BorderSizePixel = 2
+MainFrame.Position = UDim2.new(0.3, 0, 0.2, 0)
+MainFrame.Size = UDim2.new(0, 350, 0, 550)
+MainFrame.Active = true
+MainFrame.Draggable = true
+Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 10)
+
+-- ЗАГОЛОВОК
+local Title = Instance.new("TextLabel")
+Title.Parent = MainFrame
+Title.BackgroundTransparency = 1
+Title.Position = UDim2.new(0, 0, 0, 0)
+Title.Size = UDim2.new(1, 0, 0, 35)
+Title.Font = Enum.Font.GothamBold
+Title.Text = "CASE FARM ROBINA"
+Title.TextColor3 = Color3.fromRGB(150, 255, 100)
+Title.TextSize = 16
+
+-- ВЫБРАННЫЕ КЕЙСЫ
+local SelectedLabel = Instance.new("TextLabel")
+SelectedLabel.Parent = MainFrame
+SelectedLabel.BackgroundColor3 = Color3.fromRGB(30, 35, 20)
+SelectedLabel.BorderColor3 = Color3.fromRGB(150, 255, 100)
+SelectedLabel.BorderSizePixel = 1
+SelectedLabel.Position = UDim2.new(0.05, 0, 0.08, 0)
+SelectedLabel.Size = UDim2.new(0.9, 0, 0, 35)
+SelectedLabel.Font = Enum.Font.GothamBold
+SelectedLabel.Text = "SELECTED: " .. table.concat(SelectedCases, ", ")
+SelectedLabel.TextColor3 = Color3.fromRGB(150, 255, 100)
+SelectedLabel.TextSize = 9
+SelectedLabel.TextWrapped = true
+Instance.new("UICorner", SelectedLabel).CornerRadius = UDim.new(0, 5)
+
+-- СПИСОК КЕЙСОВ
+local ScrollFrame = Instance.new("ScrollingFrame")
+ScrollFrame.Parent = MainFrame
+ScrollFrame.BackgroundColor3 = Color3.fromRGB(25, 30, 15)
+ScrollFrame.BorderColor3 = Color3.fromRGB(150, 255, 100)
+ScrollFrame.BorderSizePixel = 1
+ScrollFrame.Position = UDim2.new(0.05, 0, 0.16, 0)
+ScrollFrame.Size = UDim2.new(0.9, 0, 0, 160)
+ScrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+ScrollFrame.ScrollBarThickness = 4
+Instance.new("UICorner", ScrollFrame).CornerRadius = UDim.new(0, 6)
+
+local ScrollLayout = Instance.new("UIListLayout")
+ScrollLayout.Parent = ScrollFrame
+ScrollLayout.Padding = UDim.new(0, 3)
+
+-- ДОБАВЛЕНИЕ СВОЕГО КЕЙСА
+local AddBox = Instance.new("TextBox")
+AddBox.Parent = MainFrame
+AddBox.BackgroundColor3 = Color3.fromRGB(30, 35, 20)
+AddBox.BorderColor3 = Color3.fromRGB(150, 255, 100)
+AddBox.BorderSizePixel = 1
+AddBox.Position = UDim2.new(0.05, 0, 0.48, 0)
+AddBox.Size = UDim2.new(0.55, 0, 0, 30)
+AddBox.Font = Enum.Font.Gotham
+AddBox.PlaceholderText = "+ case"
+AddBox.Text = ""
+AddBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+AddBox.TextSize = 10
+Instance.new("UICorner", AddBox).CornerRadius = UDim.new(0, 5)
+
+local AddBtn = Instance.new("TextButton")
+AddBtn.Parent = MainFrame
+AddBtn.BackgroundColor3 = Color3.fromRGB(100, 200, 50)
+AddBtn.BorderColor3 = Color3.fromRGB(150, 255, 100)
+AddBtn.BorderSizePixel = 1
+AddBtn.Position = UDim2.new(0.63, 0, 0.48, 0)
+AddBtn.Size = UDim2.new(0.32, 0, 0, 30)
+AddBtn.Font = Enum.Font.GothamBold
+AddBtn.Text = "+"
+AddBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+AddBtn.TextSize = 14
+Instance.new("UICorner", AddBtn).CornerRadius = UDim.new(0, 5)
+
+-- КНОПКА АВТОПРОДАЖА
+local SellBtn = Instance.new("TextButton")
+SellBtn.Parent = MainFrame
+SellBtn.BackgroundColor3 = Color3.fromRGB(40, 35, 40)
+SellBtn.BorderColor3 = Color3.fromRGB(255, 80, 80)
+SellBtn.BorderSizePixel = 1
+SellBtn.Position = UDim2.new(0.05, 0, 0.56, 0)
+SellBtn.Size = UDim2.new(0.43, 0, 0, 30)
+SellBtn.Font = Enum.Font.GothamBold
+SellBtn.Text = "SELL: OFF"
+SellBtn.TextColor3 = Color3.fromRGB(255, 80, 80)
+SellBtn.TextSize = 10
+Instance.new("UICorner", SellBtn).CornerRadius = UDim.new(0, 5)
+
+-- КНОПКА СТАРТ/СТОП
+local StartBtn = Instance.new("TextButton")
+StartBtn.Parent = MainFrame
+StartBtn.BackgroundColor3 = Color3.fromRGB(100, 200, 50)
+StartBtn.BorderColor3 = Color3.fromRGB(150, 255, 100)
+StartBtn.BorderSizePixel = 2
+StartBtn.Position = UDim2.new(0.52, 0, 0.56, 0)
+StartBtn.Size = UDim2.new(0.43, 0, 0, 30)
+StartBtn.Font = Enum.Font.GothamBold
+StartBtn.Text = "FARM"
+StartBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+StartBtn.TextSize = 14
+Instance.new("UICorner", StartBtn).CornerRadius = UDim.new(0, 5)
+
+-- КНОПКА НАСТРОЕК
+local SettingsBtn = Instance.new("TextButton")
+SettingsBtn.Parent = MainFrame
+SettingsBtn.BackgroundColor3 = Color3.fromRGB(40, 45, 30)
+SettingsBtn.BorderColor3 = Color3.fromRGB(150, 255, 100)
+SettingsBtn.BorderSizePixel = 1
+SettingsBtn.Position = UDim2.new(0.05, 0, 0.64, 0)
+SettingsBtn.Size = UDim2.new(0.43, 0, 0, 30)
+SettingsBtn.Font = Enum.Font.GothamBold
+SettingsBtn.Text = "SETTINGS"
+SettingsBtn.TextColor3 = Color3.fromRGB(150, 255, 100)
+SettingsBtn.TextSize = 10
+Instance.new("UICorner", SettingsBtn).CornerRadius = UDim.new(0, 5)
+
+-- КНОПКА ИНФО
+local InfoBtn = Instance.new("TextButton")
+InfoBtn.Parent = MainFrame
+InfoBtn.BackgroundColor3 = Color3.fromRGB(40, 45, 30)
+InfoBtn.BorderColor3 = Color3.fromRGB(150, 255, 100)
+InfoBtn.BorderSizePixel = 1
+InfoBtn.Position = UDim2.new(0.52, 0, 0.64, 0)
+InfoBtn.Size = UDim2.new(0.43, 0, 0, 30)
+InfoBtn.Font = Enum.Font.GothamBold
+InfoBtn.Text = "INFO"
+InfoBtn.TextColor3 = Color3.fromRGB(150, 255, 100)
+InfoBtn.TextSize = 10
+Instance.new("UICorner", InfoBtn).CornerRadius = UDim.new(0, 5)
+
+-- КНОПКА BATTLES (НОВАЯ)
+local BattlesBtn = Instance.new("TextButton")
+BattlesBtn.Parent = MainFrame
+BattlesBtn.BackgroundColor3 = Color3.fromRGB(255, 100, 50)
+BattlesBtn.BorderColor3 = Color3.fromRGB(255, 200, 100)
+BattlesBtn.BorderSizePixel = 2
+BattlesBtn.Position = UDim2.new(0.05, 0, 0.72, 0)
+BattlesBtn.Size = UDim2.new(0.9, 0, 0, 35)
+BattlesBtn.Font = Enum.Font.GothamBold
+BattlesBtn.Text = "BATTLES"
+BattlesBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+BattlesBtn.TextSize = 14
+Instance.new("UICorner", BattlesBtn).CornerRadius = UDim.new(0, 5)
+
+-- КНОПКА MOD MENU (НОВАЯ)
+local ModMenuBtn = Instance.new("TextButton")
+ModMenuBtn.Parent = MainFrame
+ModMenuBtn.BackgroundColor3 = Color3.fromRGB(150, 50, 255)
+ModMenuBtn.BorderColor3 = Color3.fromRGB(200, 150, 255)
+ModMenuBtn.BorderSizePixel = 2
+ModMenuBtn.Position = UDim2.new(0.05, 0, 0.8, 0)
+ModMenuBtn.Size = UDim2.new(0.9, 0, 0, 35)
+ModMenuBtn.Font = Enum.Font.GothamBold
+ModMenuBtn.Text = "MOD MENU"
+ModMenuBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ModMenuBtn.TextSize = 14
+Instance.new("UICorner", ModMenuBtn).CornerRadius = UDim.new(0, 5)
+
+-- СТАТУС
+local StatusLabel = Instance.new("TextLabel")
+StatusLabel.Parent = MainFrame
+StatusLabel.BackgroundTransparency = 1
+StatusLabel.Position = UDim2.new(0.05, 0, 0.89, 0)
+StatusLabel.Size = UDim2.new(0.9, 0, 0, 15)
+StatusLabel.Font = Enum.Font.Gotham
+StatusLabel.Text = "STOP"
+StatusLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
+StatusLabel.TextSize = 9
+
+-- НИЗ МЕНЮ (НИК И АВАТАР)
+local BottomFrame = Instance.new("Frame")
+BottomFrame.Parent = MainFrame
+BottomFrame.BackgroundColor3 = Color3.fromRGB(30, 35, 20)
+BottomFrame.BorderColor3 = Color3.fromRGB(150, 255, 100)
+BottomFrame.BorderSizePixel = 1
+BottomFrame.Position = UDim2.new(0.05, 0, 0.93, 0)
+BottomFrame.Size = UDim2.new(0.9, 0, 0, 35)
+Instance.new("UICorner", BottomFrame).CornerRadius = UDim.new(0, 5)
+
+local AvatarImage = Instance.new("ImageLabel")
+AvatarImage.Parent = BottomFrame
+AvatarImage.BackgroundColor3 = Color3.fromRGB(40, 45, 30)
+AvatarImage.Position = UDim2.new(0.02, 0, 0.1, 0)
+AvatarImage.Size = UDim2.new(0, 25, 0, 25)
+AvatarImage.Image = getAvatar(LocalPlayer.UserId)
+Instance.new("UICorner", AvatarImage).CornerRadius = UDim.new(0, 12)
+
+local PlayerNameLabel = Instance.new("TextLabel")
+PlayerNameLabel.Parent = BottomFrame
+PlayerNameLabel.BackgroundTransparency = 1
+PlayerNameLabel.Position = UDim2.new(0.25, 0, 0.1, 0)
+PlayerNameLabel.Size = UDim2.new(0.7, 0, 0, 25)
+PlayerNameLabel.Font = Enum.Font.GothamBold
+PlayerNameLabel.Text = LocalPlayer.Name
+PlayerNameLabel.TextColor3 = Color3.fromRGB(150, 255, 100)
+PlayerNameLabel.TextSize = 9
+PlayerNameLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+-- ========== МЕНЮ НАСТРОЕК ==========
+local SettingsFrame = Instance.new("Frame")
+SettingsFrame.Parent = ScreenGui
+SettingsFrame.BackgroundColor3 = Color3.fromRGB(20, 25, 10)
+SettingsFrame.BackgroundTransparency = 0.05
+SettingsFrame.BorderColor3 = Color3.fromRGB(150, 255, 100)
+SettingsFrame.BorderSizePixel = 2
+SettingsFrame.Position = UDim2.new(0.35, 0, 0.25, 0)
+SettingsFrame.Size = UDim2.new(0, 260, 0, 200)
+SettingsFrame.Active = true
+SettingsFrame.Draggable = true
+SettingsFrame.Visible = false
+Instance.new("UICorner", SettingsFrame).CornerRadius = UDim.new(0, 10)
+
+local SetTitle = Instance.new("TextLabel")
+SetTitle.Parent = SettingsFrame
+SetTitle.BackgroundTransparency = 1
+SetTitle.Position = UDim2.new(0, 0, 0, 0)
+SetTitle.Size = UDim2.new(1, 0, 0, 30)
+SetTitle.Font = Enum.Font.GothamBold
+SetTitle.Text = "SETTINGS"
+SetTitle.TextColor3 = Color3.fromRGB(150, 255, 100)
+SetTitle.TextSize = 14
+
+local CloseSetBtn = Instance.new("TextButton")
+CloseSetBtn.Parent = SettingsFrame
+CloseSetBtn.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+CloseSetBtn.BackgroundTransparency = 0.2
+CloseSetBtn.BorderSizePixel = 0
+CloseSetBtn.Position = UDim2.new(0.85, 0, 0.02, 0)
+CloseSetBtn.Size = UDim2.new(0, 25, 0, 25)
+CloseSetBtn.Font = Enum.Font.GothamBold
+CloseSetBtn.Text = "X"
+CloseSetBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseSetBtn.TextSize = 14
+Instance.new("UICorner", CloseSetBtn).CornerRadius = UDim.new(0, 5)
+CloseSetBtn.MouseButton1Click:Connect(function() SettingsFrame.Visible = false end)
+
+-- КОЛИЧЕСТВО КЕЙСОВ
+local AmountLabel = Instance.new("TextLabel")
+AmountLabel.Parent = SettingsFrame
+AmountLabel.BackgroundTransparency = 1
+AmountLabel.Position = UDim2.new(0.05, 0, 0.15, 0)
+AmountLabel.Size = UDim2.new(0.6, 0, 0, 30)
+AmountLabel.Font = Enum.Font.Gotham
+AmountLabel.Text = "Cases per open:"
+AmountLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+AmountLabel.TextSize = 11
+
+local AmountBox = Instance.new("TextBox")
+AmountBox.Parent = SettingsFrame
+AmountBox.BackgroundColor3 = Color3.fromRGB(30, 35, 20)
+AmountBox.BorderColor3 = Color3.fromRGB(150, 255, 100)
+AmountBox.BorderSizePixel = 1
+AmountBox.Position = UDim2.new(0.65, 0, 0.15, 0)
+AmountBox.Size = UDim2.new(0.3, 0, 0, 30)
+AmountBox.Font = Enum.Font.GothamBold
+AmountBox.Text = "10"
+AmountBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+AmountBox.TextSize = 12
+Instance.new("UICorner", AmountBox).CornerRadius = UDim.new(0, 5)
+
+-- ЗАДЕРЖКА
+local DelayLabel = Instance.new("TextLabel")
+DelayLabel.Parent = SettingsFrame
+DelayLabel.BackgroundTransparency = 1
+DelayLabel.Position = UDim2.new(0.05, 0, 0.35, 0)
+DelayLabel.Size = UDim2.new(0.6, 0, 0, 30)
+DelayLabel.Font = Enum.Font.Gotham
+DelayLabel.Text = "Delay (sec):"
+DelayLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+DelayLabel.TextSize = 11
+
+local DelayBox = Instance.new("TextBox")
+DelayBox.Parent = SettingsFrame
+DelayBox.BackgroundColor3 = Color3.fromRGB(30, 35, 20)
+DelayBox.BorderColor3 = Color3.fromRGB(150, 255, 100)
+DelayBox.BorderSizePixel = 1
+DelayBox.Position = UDim2.new(0.65, 0, 0.35, 0)
+DelayBox.Size = UDim2.new(0.3, 0, 0, 30)
+DelayBox.Font = Enum.Font.GothamBold
+DelayBox.Text = "0.01"
+DelayBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+DelayBox.TextSize = 12
+Instance.new("UICorner", DelayBox).CornerRadius = UDim.new(0, 5)
+
+-- КНОПКА СОХРАНЕНИЯ
+local SaveSettingsBtn = Instance.new("TextButton")
+SaveSettingsBtn.Parent = SettingsFrame
+SaveSettingsBtn.BackgroundColor3 = Color3.fromRGB(100, 200, 50)
+SaveSettingsBtn.BorderColor3 = Color3.fromRGB(150, 255, 100)
+SaveSettingsBtn.BorderSizePixel = 1
+SaveSettingsBtn.Position = UDim2.new(0.05, 0, 0.55, 0)
+SaveSettingsBtn.Size = UDim2.new(0.9, 0, 0, 40)
+SaveSettingsBtn.Font = Enum.Font.GothamBold
+SaveSettingsBtn.Text = "SAVE"
+SaveSettingsBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+SaveSettingsBtn.TextSize = 12
+Instance.new("UICorner", SaveSettingsBtn).CornerRadius = UDim.new(0, 6)
+
+-- ========== МЕНЮ ИНФО ==========
+local InfoFrame = Instance.new("Frame")
+InfoFrame.Parent = ScreenGui
+InfoFrame.BackgroundColor3 = Color3.fromRGB(20, 25, 10)
+InfoFrame.BackgroundTransparency = 0.05
+InfoFrame.BorderColor3 = Color3.fromRGB(150, 255, 100)
+InfoFrame.BorderSizePixel = 2
+InfoFrame.Position = UDim2.new(0.35, 0, 0.25, 0)
+InfoFrame.Size = UDim2.new(0, 300, 0, 350)
+InfoFrame.Active = true
+InfoFrame.Draggable = true
+InfoFrame.Visible = false
+Instance.new("UICorner", InfoFrame).CornerRadius = UDim.new(0, 10)
+
+local InfoTitle = Instance.new("TextLabel")
+InfoTitle.Parent = InfoFrame
+InfoTitle.BackgroundTransparency = 1
+InfoTitle.Position = UDim2.new(0, 0, 0, 0)
+InfoTitle.Size = UDim2.new(1, 0, 0, 30)
+InfoTitle.Font = Enum.Font.GothamBold
+InfoTitle.Text = "INFO"
+InfoTitle.TextColor3 = Color3.fromRGB(150, 255, 100)
+InfoTitle.TextSize = 14
+
+local CloseInfoBtn = Instance.new("TextButton")
+CloseInfoBtn.Parent = InfoFrame
+CloseInfoBtn.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+CloseInfoBtn.BackgroundTransparency = 0.2
+CloseInfoBtn.BorderSizePixel = 0
+CloseInfoBtn.Position = UDim2.new(0.85, 0, 0.02, 0)
+CloseInfoBtn.Size = UDim2.new(0, 25, 0, 25)
+CloseInfoBtn.Font = Enum.Font.GothamBold
+CloseInfoBtn.Text = "X"
+CloseInfoBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseInfoBtn.TextSize = 14
+Instance.new("UICorner", CloseInfoBtn).CornerRadius = UDim.new(0, 5)
+CloseInfoBtn.MouseButton1Click:Connect(function() InfoFrame.Visible = false end)
+
+local CreatorAvatar = Instance.new("ImageLabel")
+CreatorAvatar.Parent = InfoFrame
+CreatorAvatar.BackgroundColor3 = Color3.fromRGB(40, 45, 30)
+CreatorAvatar.Position = UDim2.new(0.35, 0, 0.1, 0)
+CreatorAvatar.Size = UDim2.new(0, 80, 0, 80)
+CreatorAvatar.Image = getAvatar(CREATOR_ID)
+Instance.new("UICorner", CreatorAvatar).CornerRadius = UDim.new(0, 40)
+
+local CreatorNameLabel = Instance.new("TextLabel")
+CreatorNameLabel.Parent = InfoFrame
+CreatorNameLabel.BackgroundTransparency = 1
+CreatorNameLabel.Position = UDim2.new(0, 0, 0.32, 0)
+CreatorNameLabel.Size = UDim2.new(1, 0, 0, 25)
+CreatorNameLabel.Font = Enum.Font.GothamBold
+CreatorNameLabel.Text = CREATOR_NAME
+CreatorNameLabel.TextColor3 = Color3.fromRGB(150, 255, 100)
+CreatorNameLabel.TextSize = 12
+
+local InfoText = Instance.new("TextLabel")
+InfoText.Parent = InfoFrame
+InfoText.BackgroundTransparency = 1
+InfoText.Position = UDim2.new(0.05, 0, 0.42, 0)
+InfoText.Size = UDim2.new(0.9, 0, 0, 200)
+InfoText.Font = Enum.Font.Gotham
+InfoText.Text = "Functions:\n- Case farming\n- Auto sell\n- Battles (vs bot)\n- Mod menu (all local changes)\n- Luck x2/x4/x6\n- Balance change\n- BP reset\n- Index/Inventory edit\n- Best Drop change"
+InfoText.TextColor3 = Color3.fromRGB(200, 200, 200)
+InfoText.TextSize = 10
+InfoText.TextWrapped = true
+InfoText.TextXAlignment = Enum.TextXAlignment.Left
+
+-- ========== МЕНЮ BATTLES ==========
+local BattlesFrame = Instance.new("Frame")
+BattlesFrame.Parent = ScreenGui
+BattlesFrame.BackgroundColor3 = Color3.fromRGB(20, 25, 10)
+BattlesFrame.BackgroundTransparency = 0.05
+BattlesFrame.BorderColor3 = Color3.fromRGB(255, 100, 50)
+BattlesFrame.BorderSizePixel = 2
+BattlesFrame.Position = UDim2.new(0.3, 0, 0.15, 0)
+BattlesFrame.Size = UDim2.new(0, 300, 0, 350)
+BattlesFrame.Active = true
+BattlesFrame.Draggable = true
+BattlesFrame.Visible = false
+Instance.new("UICorner", BattlesFrame).CornerRadius = UDim.new(0, 10)
+
+local BattlesTitle = Instance.new("TextLabel")
+BattlesTitle.Parent = BattlesFrame
+BattlesTitle.BackgroundTransparency = 1
+BattlesTitle.Position = UDim2.new(0, 0, 0, 0)
+BattlesTitle.Size = UDim2.new(1, 0, 0, 35)
+BattlesTitle.Font = Enum.Font.GothamBold
+BattlesTitle.Text = "BATTLES"
+BattlesTitle.TextColor3 = Color3.fromRGB(255, 150, 100)
+BattlesTitle.TextSize = 16
+
+local CloseBattlesBtn = Instance.new("TextButton")
+CloseBattlesBtn.Parent = BattlesFrame
+CloseBattlesBtn.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+CloseBattlesBtn.BackgroundTransparency = 0.2
+CloseBattlesBtn.BorderSizePixel = 0
+CloseBattlesBtn.Position = UDim2.new(0.88, 0, 0.02, 0)
+CloseBattlesBtn.Size = UDim2.new(0, 25, 0, 25)
+CloseBattlesBtn.Font = Enum.Font.GothamBold
+CloseBattlesBtn.Text = "X"
+CloseBattlesBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseBattlesBtn.TextSize = 14
+Instance.new("UICorner", CloseBattlesBtn).CornerRadius = UDim.new(0, 5)
+CloseBattlesBtn.MouseButton1Click:Connect(function() BattlesFrame.Visible = false end)
+
+-- Выбор кейса для батла
+local CaseSelectLabel = Instance.new("TextLabel")
+CaseSelectLabel.Parent = BattlesFrame
+CaseSelectLabel.BackgroundTransparency = 1
+CaseSelectLabel.Position = UDim2.new(0.05, 0, 0.12, 0)
+CaseSelectLabel.Size = UDim2.new(0.9, 0, 0, 25)
+CaseSelectLabel.Font = Enum.Font.Gotham
+CaseSelectLabel.Text = "Select case:"
+CaseSelectLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+CaseSelectLabel.TextSize = 12
+CaseSelectLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+local CaseDropdown = Instance.new("TextButton")
+CaseDropdown.Parent = BattlesFrame
+CaseDropdown.BackgroundColor3 = Color3.fromRGB(30, 35, 20)
+CaseDropdown.BorderColor3 = Color3.fromRGB(150, 255, 100)
+CaseDropdown.BorderSizePixel = 1
+CaseDropdown.Position = UDim2.new(0.05, 0, 0.19, 0)
+CaseDropdown.Size = UDim2.new(0.9, 0, 0, 35)
+CaseDropdown.Font = Enum.Font.Gotham
+CaseDropdown.Text = "Heavenfall"
+CaseDropdown.TextColor3 = Color3.fromRGB(255, 255, 255)
+CaseDropdown.TextSize = 12
+Instance.new("UICorner", CaseDropdown).CornerRadius = UDim.new(0, 5)
+
+-- Выпадающий список кейсов
+local CaseList = Instance.new("ScrollingFrame")
+CaseList.Parent = BattlesFrame
+CaseList.BackgroundColor3 = Color3.fromRGB(25, 30, 15)
+CaseList.BorderColor3 = Color3.fromRGB(255, 100, 50)
+CaseList.BorderSizePixel = 1
+CaseList.Position = UDim2.new(0.05, 0, 0.3, 0)
+CaseList.Size = UDim2.new(0.9, 0, 0, 150)
+CaseList.Visible = false
+CaseList.ScrollBarThickness = 4
+Instance.new("UICorner", CaseList).CornerRadius = UDim.new(0, 5)
+
+local CaseListLayout = Instance.new("UIListLayout")
+CaseListLayout.Parent = CaseList
+CaseListLayout.Padding = UDim.new(0, 2)
+
+for i, caseName in ipairs(Cases) do
+    if CasePrices[caseName] and CasePrices[caseName] >= 100 then
+        local btn = Instance.new("TextButton")
+        btn.Parent = CaseList
+        btn.BackgroundColor3 = Color3.fromRGB(35, 40, 25)
+        btn.BorderSizePixel = 0
+        btn.Size = UDim2.new(1, 0, 0, 30)
+        btn.Font = Enum.Font.Gotham
+        btn.Text = caseName .. " (" .. CasePrices[caseName] .. ")"
+        btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        btn.TextSize = 10
+        Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 4)
+        
+        btn.MouseButton1Click:Connect(function()
+            CaseDropdown.Text = caseName
+            CaseList.Visible = false
+        end)
+    end
+end
+CaseList.CanvasSize = UDim2.new(0, 0, 0, #CaseList:GetChildren() * 32)
+
+CaseDropdown.MouseButton1Click:Connect(function()
+    CaseList.Visible = not CaseList.Visible
+end)
+
+-- Количество кейсов
+local BattleCountLabel = Instance.new("TextLabel")
+BattleCountLabel.Parent = BattlesFrame
+BattleCountLabel.BackgroundTransparency = 1
+BattleCountLabel.Position = UDim2.new(0.05, 0, 0.52, 0)
+BattleCountLabel.Size = UDim2.new(0.5, 0, 0, 25)
+BattleCountLabel.Font = Enum.Font.Gotham
+BattleCountLabel.Text = "Amount (1-10):"
+BattleCountLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+BattleCountLabel.TextSize = 12
+BattleCountLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+local BattleCountBox = Instance.new("TextBox")
+BattleCountBox.Parent = BattlesFrame
+BattleCountBox.BackgroundColor3 = Color3.fromRGB(30, 35, 20)
+BattleCountBox.BorderColor3 = Color3.fromRGB(150, 255, 100)
+BattleCountBox.BorderSizePixel = 1
+BattleCountBox.Position = UDim2.new(0.55, 0, 0.52, 0)
+BattleCountBox.Size = UDim2.new(0.4, 0, 0, 30)
+BattleCountBox.Font = Enum.Font.Gotham
+BattleCountBox.Text = "10"
+BattleCountBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+BattleCountBox.TextSize = 12
+Instance.new("UICorner", BattleCountBox).CornerRadius = UDim.new(0, 5)
+
+-- Кнопка создать батл
+local CreateBattleBtn = Instance.new("TextButton")
+CreateBattleBtn.Parent = BattlesFrame
+CreateBattleBtn.BackgroundColor3 = Color3.fromRGB(100, 200, 50)
+CreateBattleBtn.BorderColor3 = Color3.fromRGB(150, 255, 100)
+CreateBattleBtn.BorderSizePixel = 1
+CreateBattleBtn.Position = UDim2.new(0.05, 0, 0.65, 0)
+CreateBattleBtn.Size = UDim2.new(0.9, 0, 0, 40)
+CreateBattleBtn.Font = Enum.Font.GothamBold
+CreateBattleBtn.Text = "CREATE BATTLE"
+CreateBattleBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+CreateBattleBtn.TextSize = 14
+Instance.new("UICorner", CreateBattleBtn).CornerRadius = UDim.new(0, 5)
+
+-- Кнопка играть с ботом
+local PlayBotBtn = Instance.new("TextButton")
+PlayBotBtn.Parent = BattlesFrame
+PlayBotBtn.BackgroundColor3 = Color3.fromRGB(255, 150, 50)
+PlayBotBtn.BorderColor3 = Color3.fromRGB(255, 200, 100)
+PlayBotBtn.BorderSizePixel = 1
+PlayBotBtn.Position = UDim2.new(0.05, 0, 0.78, 0)
+PlayBotBtn.Size = UDim2.new(0.9, 0, 0, 40)
+PlayBotBtn.Font = Enum.Font.GothamBold
+PlayBotBtn.Text = "PLAY WITH BOT"
+PlayBotBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+PlayBotBtn.TextSize = 14
+Instance.new("UICorner", PlayBotBtn).CornerRadius = UDim.new(0, 5)
+
+-- Статус батла
+local BattleStatus = Instance.new("TextLabel")
+BattleStatus.Parent = BattlesFrame
+BattleStatus.BackgroundTransparency = 1
+BattleStatus.Position = UDim2.new(0.05, 0, 0.9, 0)
+BattleStatus.Size = UDim2.new(0.9, 0, 0, 25)
+BattleStatus.Font = Enum.Font.Gotham
+BattleStatus.Text = "Ready"
+BattleStatus.TextColor3 = Color3.fromRGB(150, 150, 150)
+BattleStatus.TextSize = 10
+
+-- ========== MOD MENU ==========
+local ModFrame = Instance.new("Frame")
+ModFrame.Parent = ScreenGui
+ModFrame.BackgroundColor3 = Color3.fromRGB(15, 20, 10)
+ModFrame.BackgroundTransparency = 0.05
+ModFrame.BorderColor3 = Color3.fromRGB(200, 100, 255)
+ModFrame.BorderSizePixel = 2
+ModFrame.Position = UDim2.new(0.2, 0, 0.1, 0)
+ModFrame.Size = UDim2.new(0, 400, 0, 500)
+ModFrame.Active = true
+ModFrame.Draggable = true
+ModFrame.Visible = false
+Instance.new("UICorner", ModFrame).CornerRadius = UDim.new(0, 10)
+
+local ModTitle = Instance.new("TextLabel")
+ModTitle.Parent = ModFrame
+ModTitle.BackgroundTransparency = 1
+ModTitle.Position = UDim2.new(0, 0, 0, 0)
+ModTitle.Size = UDim2.new(1, 0, 0, 35)
+ModTitle.Font = Enum.Font.GothamBold
+ModTitle.Text = "MOD MENU (FULL)"
+ModTitle.TextColor3 = Color3.fromRGB(200, 150, 255)
+ModTitle.TextSize = 16
+
+local CloseModBtn = Instance.new("TextButton")
+CloseModBtn.Parent = ModFrame
+CloseModBtn.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+CloseModBtn.BackgroundTransparency = 0.2
+CloseModBtn.BorderSizePixel = 0
+CloseModBtn.Position = UDim2.new(0.9, 0, 0.01, 0)
+CloseModBtn.Size = UDim2.new(0, 30, 0, 30)
+CloseModBtn.Font = Enum.Font.GothamBold
+CloseModBtn.Text = "X"
+CloseModBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseModBtn.TextSize = 16
+Instance.new("UICorner", CloseModBtn).CornerRadius = UDim.new(0, 5)
+CloseModBtn.MouseButton1Click:Connect(function() ModFrame.Visible = false end)
+
+-- Вкладки
+local TabFrame = Instance.new("Frame")
+TabFrame.Parent = ModFrame
+TabFrame.BackgroundColor3 = Color3.fromRGB(25, 30, 15)
+TabFrame.BorderSizePixel = 0
+TabFrame.Position = UDim2.new(0, 0, 0.08, 0)
+TabFrame.Size = UDim2.new(1, 0, 0, 30)
+
+local Tab1 = Instance.new("TextButton")
+Tab1.Parent = TabFrame
+Tab1.BackgroundColor3 = Color3.fromRGB(150, 50, 255)
+Tab1.BorderSizePixel = 0
+Tab1.Position = UDim2.new(0, 0, 0, 0)
+Tab1.Size = UDim2.new(0.33, 0, 1, 0)
+Tab1.Font = Enum.Font.GothamBold
+Tab1.Text = "BALANCE"
+Tab1.TextColor3 = Color3.fromRGB(255, 255, 255)
+Tab1.TextSize = 10
+
+local Tab2 = Instance.new("TextButton")
+Tab2.Parent = TabFrame
+Tab2.BackgroundColor3 = Color3.fromRGB(40, 45, 30)
+Tab2.BorderSizePixel = 0
+Tab2.Position = UDim2.new(0.33, 0, 0, 0)
+Tab2.Size = UDim2.new(0.33, 0, 1, 0)
+Tab2.Font = Enum.Font.GothamBold
+Tab2.Text = "LUCK & BP"
+Tab2.TextColor3 = Color3.fromRGB(150, 255, 100)
+Tab2.TextSize = 10
+
+local Tab3 = Instance.new("TextButton")
+Tab3.Parent = TabFrame
+Tab3.BackgroundColor3 = Color3.fromRGB(40, 45, 30)
+Tab3.BorderSizePixel = 0
+Tab3.Position = UDim2.new(0.66, 0, 0, 0)
+Tab3.Size = UDim2.new(0.34, 0, 1, 0)
+Tab3.Font = Enum.Font.GothamBold
+Tab3.Text = "ITEMS"
+Tab3.TextColor3 = Color3.fromRGB(150, 255, 100)
+Tab3.TextSize = 10
+
+-- Контент вкладок
+local Content1 = Instance.new("Frame")
+Content1.Parent = ModFrame
+Content1.BackgroundTransparency = 1
+Content1.Position = UDim2.new(0.02, 0, 0.15, 0)
+Content1.Size = UDim2.new(0.96, 0, 0.83, 0)
+
+local Content2 = Instance.new("Frame")
+Content2.Parent = ModFrame
+Content2.BackgroundTransparency = 1
+Content2.Position = UDim2.new(0.02, 0, 0.15, 0)
+Content2.Size = UDim2.new(0.96, 0, 0.83, 0)
+Content2.Visible = false
+
+local Content3 = Instance.new("Frame")
+Content3.Parent = ModFrame
+Content3.BackgroundTransparency = 1
+Content3.Position = UDim2.new(0.02, 0, 0.15, 0)
+Content3.Size = UDim2.new(0.96, 0, 0.83, 0)
+Content3.Visible = false
+
+Tab1.MouseButton1Click:Connect(function()
+    Content1.Visible = true; Content2.Visible = false; Content3.Visible = false
+    Tab1.BackgroundColor3 = Color3.fromRGB(150, 50, 255)
+    Tab2.BackgroundColor3 = Color3.fromRGB(40, 45, 30)
+    Tab3.BackgroundColor3 = Color3.fromRGB(40, 45, 30)
+end)
+
+Tab2.MouseButton1Click:Connect(function()
+    Content1.Visible = false; Content2.Visible = true; Content3.Visible = false
+    Tab1.BackgroundColor3 = Color3.fromRGB(40, 45, 30)
+    Tab2.BackgroundColor3 = Color3.fromRGB(150, 50, 255)
+    Tab3.BackgroundColor3 = Color3.fromRGB(40, 45, 30)
+end)
+
+Tab3.MouseButton1Click:Connect(function()
+    Content1.Visible = false; Content2.Visible = false; Content3.Visible = true
+    Tab1.BackgroundColor3 = Color3.fromRGB(40, 45, 30)
+    Tab2.BackgroundColor3 = Color3.fromRGB(40, 45, 30)
+    Tab3.BackgroundColor3 = Color3.fromRGB(150, 50, 255)
+end)
+
+-- ====== ВКЛАДКА 1: БАЛАНС ======
+local y = 0
+local function createBalanceEdit(name, valueName, yPos)
+    local label = Instance.new("TextLabel")
+    label.Parent = Content1
+    label.BackgroundTransparency = 1
+    label.Position = UDim2.new(0, 0, yPos, 0)
+    label.Size = UDim2.new(0.35, 0, 0, 30)
+    label.Font = Enum.Font.Gotham
+    label.Text = name .. ":"
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.TextSize = 12
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    
+    local box = Instance.new("TextBox")
+    box.Parent = Content1
+    box.BackgroundColor3 = Color3.fromRGB(30, 35, 20)
+    box.BorderColor3 = Color3.fromRGB(150, 255, 100)
+    box.BorderSizePixel = 1
+    box.Position = UDim2.new(0.38, 0, yPos, 0)
+    box.Size = UDim2.new(0.4, 0, 0, 30)
+    box.Font = Enum.Font.Gotham
+    box.PlaceholderText = "Amount"
+    box.Text = ""
+    box.TextColor3 = Color3.fromRGB(255, 255, 255)
+    box.TextSize = 11
+    Instance.new("UICorner", box).CornerRadius = UDim.new(0, 4)
+    
+    local btn = Instance.new("TextButton")
+    btn.Parent = Content1
+    btn.BackgroundColor3 = Color3.fromRGB(100, 200, 50)
+    btn.BorderSizePixel = 0
+    btn.Position = UDim2.new(0.8, 0, yPos, 0)
+    btn.Size = UDim2.new(0.18, 0, 0, 30)
+    btn.Font = Enum.Font.GothamBold
+    btn.Text = "SET"
+    btn.TextColor3 = Color3.fromRGB(0, 0, 0)
+    btn.TextSize = 11
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 4)
+    
+    btn.MouseButton1Click:Connect(function()
+        local val = tonumber(box.Text)
+        if val then
+            local v = LocalPlayer:FindFirstChild(valueName)
+            if v and v:IsA("IntValue") then v.Value = val end
+        end
+    end)
+end
+
+createBalanceEdit("Stars", "_StarsValue", 0)
+createBalanceEdit("TON", "_TONValue", 0.08)
+createBalanceEdit("Gems", "_GemsValue", 0.16)
+createBalanceEdit("BP Level", "_BPLevel", 0.24)
+createBalanceEdit("BP XP", "_BPXP", 0.32)
+
+-- ====== ВКЛАДКА 2: LUCK & BP ======
+local y2 = 0
+
+-- Luck buttons
+local LuckLabel = Instance.new("TextLabel")
+LuckLabel.Parent = Content2
+LuckLabel.BackgroundTransparency = 1
+LuckLabel.Position = UDim2.new(0, 0, y2, 0)
+LuckLabel.Size = UDim2.new(1, 0, 0, 25)
+LuckLabel.Font = Enum.Font.GothamBold
+LuckLabel.Text = "LUCK"
+LuckLabel.TextColor3 = Color3.fromRGB(255, 200, 100)
+LuckLabel.TextSize = 14
+
+y2 = y2 + 0.06
+
+for i, mult in ipairs({2, 4, 6}) do
+    local btn = Instance.new("TextButton")
+    btn.Parent = Content2
+    btn.BackgroundColor3 = Color3.fromRGB(255, 150 + (i-1)*30, 50)
+    btn.BorderSizePixel = 0
+    btn.Position = UDim2.new((i-1)*0.33, 0, y2, 0)
+    btn.Size = UDim2.new(0.3, 0, 0, 35)
+    btn.Font = Enum.Font.GothamBold
+    btn.Text = "x" .. mult
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.TextSize = 14
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 5)
+    
+    btn.MouseButton1Click:Connect(function()
+        for _, e in ipairs({Events:FindFirstChild("AbuseVisual"), Events:FindFirstChild("SettingsEvent")}) do
+            if e then
+                e:FireServer("Lucky", mult)
+                e:FireServer("Lucky", "x" .. mult)
+                e:FireServer("x" .. mult)
+            end
+        end
+    end)
+end
+
+y2 = y2 + 0.09
+
+-- BP Reset
+local BPResetBtn = Instance.new("TextButton")
+BPResetBtn.Parent = Content2
+BPResetBtn.BackgroundColor3 = Color3.fromRGB(100, 150, 255)
+BPResetBtn.BorderSizePixel = 0
+BPResetBtn.Position = UDim2.new(0, 0, y2, 0)
+BPResetBtn.Size = UDim2.new(1, 0, 0, 35)
+BPResetBtn.Font = Enum.Font.GothamBold
+BPResetBtn.Text = "RESET BP CLAIMS"
+BPResetBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+BPResetBtn.TextSize = 12
+Instance.new("UICorner", BPResetBtn).CornerRadius = UDim.new(0, 5)
+
+BPResetBtn.MouseButton1Click:Connect(function()
+    local bp = LocalPlayer:FindFirstChild("_BPClaimed")
+    if bp then
+        for _, v in ipairs(bp:GetChildren()) do
+            if v:IsA("BoolValue") then v.Value = false end
+        end
+    end
+end)
+
+y2 = y2 + 0.09
+
+-- Daily Timer Reset
+local DailyResetBtn = Instance.new("TextButton")
+DailyResetBtn.Parent = Content2
+DailyResetBtn.BackgroundColor3 = Color3.fromRGB(100, 200, 150)
+DailyResetBtn.BorderSizePixel = 0
+DailyResetBtn.Position = UDim2.new(0, 0, y2, 0)
+DailyResetBtn.Size = UDim2.new(1, 0, 0, 35)
+DailyResetBtn.Font = Enum.Font.GothamBold
+DailyResetBtn.Text = "RESET DAILY TIMER"
+DailyResetBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+DailyResetBtn.TextSize = 12
+Instance.new("UICorner", DailyResetBtn).CornerRadius = UDim.new(0, 5)
+
+DailyResetBtn.MouseButton1Click:Connect(function()
+    local dt = LocalPlayer:FindFirstChild("_DT")
+    if dt then dt.Value = 0 end
+    local wt = LocalPlayer:FindFirstChild("_WT")
+    if wt then wt.Value = 0 end
+end)
+
+-- ====== ВКЛАДКА 3: ITEMS ======
+local y3 = 0
+
+-- Best Drop
+local BestDropLabel = Instance.new("TextLabel")
+BestDropLabel.Parent = Content3
+BestDropLabel.BackgroundTransparency = 1
+BestDropLabel.Position = UDim2.new(0, 0, y3, 0)
+BestDropLabel.Size = UDim2.new(1, 0, 0, 25)
+BestDropLabel.Font = Enum.Font.GothamBold
+BestDropLabel.Text = "BEST DROP"
+BestDropLabel.TextColor3 = Color3.fromRGB(255, 200, 100)
+BestDropLabel.TextSize = 12
+
+y3 = y3 + 0.06
+
+local BestDropBox = Instance.new("TextBox")
+BestDropBox.Parent = Content3
+BestDropBox.BackgroundColor3 = Color3.fromRGB(30, 35, 20)
+BestDropBox.BorderColor3 = Color3.fromRGB(150, 255, 100)
+BestDropBox.BorderSizePixel = 1
+BestDropBox.Position = UDim2.new(0, 0, y3, 0)
+BestDropBox.Size = UDim2.new(0.65, 0, 0, 30)
+BestDropBox.Font = Enum.Font.Gotham
+BestDropBox.PlaceholderText = "NFT Name"
+BestDropBox.Text = ""
+BestDropBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+BestDropBox.TextSize = 10
+Instance.new("UICorner", BestDropBox).CornerRadius = UDim.new(0, 4)
+
+local BestDropBtn = Instance.new("TextButton")
+BestDropBtn.Parent = Content3
+BestDropBtn.BackgroundColor3 = Color3.fromRGB(100, 200, 50)
+BestDropBtn.BorderSizePixel = 0
+BestDropBtn.Position = UDim2.new(0.68, 0, y3, 0)
+BestDropBtn.Size = UDim2.new(0.3, 0, 0, 30)
+BestDropBtn.Font = Enum.Font.GothamBold
+BestDropBtn.Text = "SET"
+BestDropBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+BestDropBtn.TextSize = 11
+Instance.new("UICorner", BestDropBtn).CornerRadius = UDim.new(0, 4)
+
+BestDropBtn.MouseButton1Click:Connect(function()
+    local val = BestDropBox.Text
+    if val ~= "" then
+        local bd = LocalPlayer:FindFirstChild("_BestDrop")
+        if not bd then
+            bd = Instance.new("StringValue", LocalPlayer)
+            bd.Name = "_BestDrop"
+        end
+        bd.Value = val
+    end
+end)
+
+y3 = y3 + 0.09
+
+-- Index Edit
+local IndexLabel = Instance.new("TextLabel")
+IndexLabel.Parent = Content3
+IndexLabel.BackgroundTransparency = 1
+IndexLabel.Position = UDim2.new(0, 0, y3, 0)
+IndexLabel.Size = UDim2.new(1, 0, 0, 25)
+IndexLabel.Font = Enum.Font.GothamBold
+IndexLabel.Text = "INDEX (Add/Edit)"
+IndexLabel.TextColor3 = Color3.fromRGB(150, 255, 100)
+IndexLabel.TextSize = 12
+
+y3 = y3 + 0.06
+
+local IndexNameBox = Instance.new("TextBox")
+IndexNameBox.Parent = Content3
+IndexNameBox.BackgroundColor3 = Color3.fromRGB(30, 35, 20)
+IndexNameBox.BorderColor3 = Color3.fromRGB(150, 255, 100)
+IndexNameBox.BorderSizePixel = 1
+IndexNameBox.Position = UDim2.new(0, 0, y3, 0)
+IndexNameBox.Size = UDim2.new(0.5, 0, 0, 30)
+IndexNameBox.Font = Enum.Font.Gotham
+IndexNameBox.PlaceholderText = "NFT Name"
+IndexNameBox.Text = ""
+IndexNameBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+IndexNameBox.TextSize = 10
+Instance.new("UICorner", IndexNameBox).CornerRadius = UDim.new(0, 4)
+
+local IndexCountBox = Instance.new("TextBox")
+IndexCountBox.Parent = Content3
+IndexCountBox.BackgroundColor3 = Color3.fromRGB(30, 35, 20)
+IndexCountBox.BorderColor3 = Color3.fromRGB(150, 255, 100)
+IndexCountBox.BorderSizePixel = 1
+IndexCountBox.Position = UDim2.new(0.53, 0, y3, 0)
+IndexCountBox.Size = UDim2.new(0.25, 0, 0, 30)
+IndexCountBox.Font = Enum.Font.Gotham
+IndexCountBox.PlaceholderText = "Count"
+IndexCountBox.Text = ""
+IndexCountBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+IndexCountBox.TextSize = 10
+Instance.new("UICorner", IndexCountBox).CornerRadius = UDim.new(0, 4)
+
+local IndexSetBtn = Instance.new("TextButton")
+IndexSetBtn.Parent = Content3
+IndexSetBtn.BackgroundColor3 = Color3.fromRGB(100, 200, 50)
+IndexSetBtn.BorderSizePixel = 0
+IndexSetBtn.Position = UDim2.new(0.8, 0, y3, 0)
+IndexSetBtn.Size = UDim2.new(0.18, 0, 0, 30)
+IndexSetBtn.Font = Enum.Font.GothamBold
+IndexSetBtn.Text = "SET"
+IndexSetBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+IndexSetBtn.TextSize = 11
+Instance.new("UICorner", IndexSetBtn).CornerRadius = UDim.new(0, 4)
+
+IndexSetBtn.MouseButton1Click:Connect(function()
+    local name = IndexNameBox.Text
+    local count = IndexCountBox.Text
+    if name ~= "" and count ~= "" then
+        local idx = LocalPlayer:FindFirstChild("_Index") or Instance.new("Folder", LocalPlayer)
+        idx.Name = "_Index"
+        local item = idx:FindFirstChild(name) or Instance.new("IntValue", idx)
+        item.Name = name
+        item.Value = tonumber(count) or 1
+    end
+end)
+
+y3 = y3 + 0.09
+
+-- Inventory Add
+local InvLabel = Instance.new("TextLabel")
+InvLabel.Parent = Content3
+InvLabel.BackgroundTransparency = 1
+InvLabel.Position = UDim2.new(0, 0, y3, 0)
+InvLabel.Size = UDim2.new(1, 0, 0, 25)
+InvLabel.Font = Enum.Font.GothamBold
+InvLabel.Text = "INVENTORY (Add)"
+InvLabel.TextColor3 = Color3.fromRGB(150, 255, 100)
+InvLabel.TextSize = 12
+
+y3 = y3 + 0.06
+
+local InvNameBox = Instance.new("TextBox")
+InvNameBox.Parent = Content3
+InvNameBox.BackgroundColor3 = Color3.fromRGB(30, 35, 20)
+InvNameBox.BorderColor3 = Color3.fromRGB(150, 255, 100)
+InvNameBox.BorderSizePixel = 1
+InvNameBox.Position = UDim2.new(0, 0, y3, 0)
+InvNameBox.Size = UDim2.new(0.65, 0, 0, 30)
+InvNameBox.Font = Enum.Font.Gotham
+InvNameBox.PlaceholderText = "Item Name"
+InvNameBox.Text = ""
+InvNameBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+InvNameBox.TextSize = 10
+Instance.new("UICorner", InvNameBox).CornerRadius = UDim.new(0, 4)
+
+local InvAddBtn = Instance.new("TextButton")
+InvAddBtn.Parent = Content3
+InvAddBtn.BackgroundColor3 = Color3.fromRGB(100, 200, 50)
+InvAddBtn.BorderSizePixel = 0
+InvAddBtn.Position = UDim2.new(0.68, 0, y3, 0)
+InvAddBtn.Size = UDim2.new(0.3, 0, 0, 30)
+InvAddBtn.Font = Enum.Font.GothamBold
+InvAddBtn.Text = "ADD"
+InvAddBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+InvAddBtn.TextSize = 11
+Instance.new("UICorner", InvAddBtn).CornerRadius = UDim.new(0, 4)
+
+InvAddBtn.MouseButton1Click:Connect(function()
+    local name = InvNameBox.Text
+    if name ~= "" then
+        local inv = LocalPlayer:FindFirstChild("_Inventory") or Instance.new("Folder", LocalPlayer)
+        inv.Name = "_Inventory"
+        local item = Instance.new("StringValue", inv)
+        item.Name = name
+        item.Value = name
+    end
+end)
+
+-- ========== ФУНКЦИИ ==========
+local function formatNumber(num)
+    if num >= 1000000 then return string.format("%.1fM", num / 1000000)
+    elseif num >= 1000 then return string.format("%.1fK", num / 1000)
+    else return tostring(num) end
+end
+
+local function UpdateSelectedLabel()
+    if #SelectedCases == 0 then
+        SelectedLabel.Text = "NO CASE SELECTED!"
+        return
+    end
+    local caseNames = {}
+    for i, case in ipairs(SelectedCases) do table.insert(caseNames, case) end
+    SelectedLabel.Text = "SELECTED: " .. table.concat(caseNames, ", ")
+end
+
+local function RefreshCaseList()
+    for _, child in pairs(ScrollFrame:GetChildren()) do
+        if child:IsA("TextButton") then child:Destroy() end
+    end
+    for i, caseName in ipairs(CustomCases) do
+        local btn = Instance.new("TextButton")
+        btn.Parent = ScrollFrame
+        btn.BackgroundColor3 = Color3.fromRGB(35, 40, 25)
+        btn.BorderColor3 = Color3.fromRGB(150, 255, 100)
+        btn.BorderSizePixel = 1
+        btn.Size = UDim2.new(1, 0, 0, 28)
+        btn.Font = Enum.Font.Gotham
+        local price = CasePrices[caseName] or 0
+        local priceText = price == 0 and " [FREE]" or " [" .. formatNumber(price) .. "]"
+        btn.Text = caseName .. priceText
+        btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        btn.TextSize = 10
+        btn.TextWrapped = true
+        Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 4)
+        
+        local isSelected = false
+        for _, selected in ipairs(SelectedCases) do
+            if selected == caseName then isSelected = true; break end
+        end
+        if isSelected then
+            btn.BackgroundColor3 = Color3.fromRGB(100, 200, 50)
+            btn.TextColor3 = Color3.fromRGB(0, 0, 0)
+        end
+        
+        btn.MouseButton1Click:Connect(function()
+            local found = false
+            for i, selected in ipairs(SelectedCases) do
+                if selected == caseName then
+                    table.remove(SelectedCases, i)
+                    found = true
+                    break
+                end
+            end
+            if not found then table.insert(SelectedCases, caseName) end
+            UpdateSelectedLabel()
+            RefreshCaseList()
+        end)
+    end
+    ScrollFrame.CanvasSize = UDim2.new(0, 0, 0, #CustomCases * 32 + 10)
+end
+
+AddBtn.MouseButton1Click:Connect(function()
+    local newCase = AddBox.Text
+    if newCase ~= "" then
+        local exists = false
+        for _, v in ipairs(CustomCases) do if v == newCase then exists = true; break end end
+        if not exists then
+            table.insert(CustomCases, newCase)
+            CasePrices[newCase] = 0
+            RefreshCaseList()
+            AddBox.Text = ""
+        end
+    end
+end)
+
+local function UpdateSellUI()
+    if AutoSell then
+        SellBtn.BackgroundColor3 = Color3.fromRGB(100, 200, 50)
+        SellBtn.BorderColor3 = Color3.fromRGB(150, 255, 100)
+        SellBtn.Text = "SELL: ON"
+        SellBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+    else
+        SellBtn.BackgroundColor3 = Color3.fromRGB(40, 35, 40)
+        SellBtn.BorderColor3 = Color3.fromRGB(255, 80, 80)
+        SellBtn.Text = "SELL: OFF"
+        SellBtn.TextColor3 = Color3.fromRGB(255, 80, 80)
+    end
+end
+
+SellBtn.MouseButton1Click:Connect(function()
+    AutoSell = not AutoSell
+    UpdateSellUI()
+end)
+
+SettingsBtn.MouseButton1Click:Connect(function()
+    SettingsFrame.Visible = true
+    SettingsFrame.Position = MainFrame.Position
+end)
+
+InfoBtn.MouseButton1Click:Connect(function()
+    InfoFrame.Visible = true
+    InfoFrame.Position = MainFrame.Position
+end)
+
+BattlesBtn.MouseButton1Click:Connect(function()
+    BattlesFrame.Visible = true
+    BattlesFrame.Position = MainFrame.Position
+end)
+
+ModMenuBtn.MouseButton1Click:Connect(function()
+    ModFrame.Visible = true
+end)
+
+SaveSettingsBtn.MouseButton1Click:Connect(function()
+    local num = tonumber(AmountBox.Text)
+    if num and num >= 1 and num <= 100 then
+        OpenAmount = math.floor(num)
+        AmountBox.Text = tostring(OpenAmount)
+    else
+        OpenAmount = 10
+        AmountBox.Text = "10"
+    end
+    local num2 = tonumber(DelayBox.Text)
+    if num2 and num2 >= 0.005 then
+        FarmDelay = num2
+        DelayBox.Text = tostring(FarmDelay)
+    else
+        FarmDelay = 0.01
+        DelayBox.Text = "0.01"
+    end
+    SettingsFrame.Visible = false
+end)
+
+-- ========== BATTLES LOGIC ==========
+local Battles = Events:FindFirstChild("Battles")
+local Btl = Events:FindFirstChild("Btl")
+
+CreateBattleBtn.MouseButton1Click:Connect(function()
+    local caseName = CaseDropdown.Text
+    local amount = tonumber(BattleCountBox.Text) or 10
+    if amount < 1 then amount = 1 elseif amount > 10 then amount = 10 end
+    
+    local cases = {}
+    for i = 1, amount do table.insert(cases, caseName) end
+    
+    if Battles then
+        local success, result = pcall(function()
+            return Battles:InvokeServer("Create", cases, {})
+        end)
+        if success then
+            BattleStatus.Text = "Battle created: " .. amount .. "x " .. caseName
+            BattleStatus.TextColor3 = Color3.fromRGB(100, 255, 100)
+        else
+            BattleStatus.Text = "Failed to create battle"
+            BattleStatus.TextColor3 = Color3.fromRGB(255, 100, 100)
+        end
+    end
+end)
+
+PlayBotBtn.MouseButton1Click:Connect(function()
+    if Battles then
+        pcall(function() Battles:InvokeServer("CallABot") end)
+        BattleStatus.Text = "Bot called!"
+        BattleStatus.TextColor3 = Color3.fromRGB(100, 255, 100)
+    end
+end)
+
+-- ========== ОСНОВНОЙ ЦИКЛ ФАРМА ==========
+local function FarmLoop()
+    while Farming do
+        pcall(function()
+            if #SelectedCases > 0 then
+                for _, caseName in ipairs(SelectedCases) do
+                    local OpenCase = Events:FindFirstChild("OpenCase")
+                    if OpenCase then
+                        OpenCase:InvokeServer(caseName, OpenAmount)
+                        task.wait(0.5)
+                    end
+                end
+                if AutoSell then
+                    local Inventory = Events:FindFirstChild("Inventory")
+                    if Inventory then
+                        Inventory:FireServer("Sell", "ALL")
+                    end
+                end
+            end
+        end)
+        task.wait(FarmDelay)
+    end
+end
+
+StartBtn.MouseButton1Click:Connect(function()
+    if not Farming then
+        if #SelectedCases == 0 then
+            StatusLabel.Text = "SELECT CASE!"
+            StatusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+            task.wait(1)
+            StatusLabel.Text = "STOP"
+            StatusLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
+            return
+        end
+        Farming = true
+        StartBtn.BackgroundColor3 = Color3.fromRGB(200, 80, 50)
+        StartBtn.Text = "STOP"
+        StatusLabel.Text = "FARMING"
+        StatusLabel.TextColor3 = Color3.fromRGB(150, 255, 100)
+        task.spawn(FarmLoop)
+    else
+        Farming = false
+        StartBtn.BackgroundColor3 = Color3.fromRGB(100, 200, 50)
+        StartBtn.Text = "FARM"
+        StatusLabel.Text = "STOP"
+        StatusLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
+    end
+end)
+
+-- ЗАПУСК
+RefreshCaseList()
+UpdateSellUI()
+UpdateSelectedLabel()
+
+print("CASE FARM ROBINA + BATTLES + MOD MENU LOADED!")
+print("Created by " .. CREATOR_NAME)
