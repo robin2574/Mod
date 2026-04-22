@@ -1,0 +1,1152 @@
+--[[
+    NFT/TON BATTLE - ГЛАВНОЕ МЕНЮ
+    Выбор игры → все читы внутри
+--]]
+
+local Player = game:GetService("Players").LocalPlayer
+local RS = game:GetService("ReplicatedStorage")
+local CoreGui = game:GetService("CoreGui")
+
+-- Очистка старого GUI
+if CoreGui:FindFirstChild("MainMenuHub") then
+    CoreGui.MainMenuHub:Destroy()
+end
+
+local Hub = Instance.new("ScreenGui")
+Hub.Name = "MainMenuHub"
+Hub.Parent = CoreGui
+Hub.ResetOnSpawn = false
+Hub.IgnoreGuiInset = true
+
+-- ГЛАВНОЕ МЕНЮ
+local MainMenu = Instance.new("Frame")
+MainMenu.Size = UDim2.new(0, 300, 0, 200)
+MainMenu.Position = UDim2.new(0.5, -150, 0.5, -100)
+MainMenu.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+MainMenu.BorderSizePixel = 0
+MainMenu.Active = true
+MainMenu.Draggable = true
+MainMenu.Visible = true
+MainMenu.Parent = Hub
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 12)
+UICorner.Parent = MainMenu
+
+-- Заголовок
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 40)
+Title.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
+Title.BorderSizePixel = 0
+Title.Text = "🎮 ВЫБОР ИГРЫ"
+Title.TextColor3 = Color3.fromRGB(255, 200, 100)
+Title.TextSize = 20
+Title.Font = Enum.Font.GothamBold
+Title.Parent = MainMenu
+Instance.new("UICorner", Title).CornerRadius = UDim.new(0, 12)
+
+-- Кнопка TON BATTLE
+local TonButton = Instance.new("TextButton")
+TonButton.Size = UDim2.new(1, -40, 0, 50)
+TonButton.Position = UDim2.new(0, 20, 0, 60)
+TonButton.BackgroundColor3 = Color3.fromRGB(50, 150, 200)
+TonButton.Text = "💎 TON BATTLE"
+TonButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+TonButton.TextSize = 20
+TonButton.Font = Enum.Font.GothamBold
+TonButton.Parent = MainMenu
+Instance.new("UICorner", TonButton).CornerRadius = UDim.new(0, 10)
+
+-- Кнопка NFT BATTLE
+local NftButton = Instance.new("TextButton")
+NftButton.Size = UDim2.new(1, -40, 0, 50)
+NftButton.Position = UDim2.new(0, 20, 0, 130)
+NftButton.BackgroundColor3 = Color3.fromRGB(200, 100, 100)
+NftButton.Text = "🖼️ NFT BATTLE"
+NftButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+NftButton.TextSize = 20
+NftButton.Font = Enum.Font.GothamBold
+NftButton.Parent = MainMenu
+Instance.new("UICorner", NftButton).CornerRadius = UDim.new(0, 10)
+
+-- =============================================
+-- МЕНЮ TON BATTLE
+-- =============================================
+local TonMenu = Instance.new("Frame")
+TonMenu.Size = UDim2.new(0, 350, 0, 450)
+TonMenu.Position = UDim2.new(0.5, -175, 0.5, -225)
+TonMenu.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
+TonMenu.BorderSizePixel = 0
+TonMenu.Active = true
+TonMenu.Draggable = true
+TonMenu.Visible = false
+TonMenu.Parent = Hub
+Instance.new("UICorner", TonMenu).CornerRadius = UDim.new(0, 12)
+
+local TonTopBar = Instance.new("Frame")
+TonTopBar.Size = UDim2.new(1, 0, 0, 45)
+TonTopBar.BackgroundColor3 = Color3.fromRGB(25, 25, 40)
+TonTopBar.BorderSizePixel = 0
+TonTopBar.Parent = TonMenu
+Instance.new("UICorner", TonTopBar).CornerRadius = UDim.new(0, 12)
+
+local TonTitle = Instance.new("TextLabel")
+TonTitle.Size = UDim2.new(0, 200, 1, 0)
+TonTitle.Position = UDim2.new(0, 15, 0, 0)
+TonTitle.BackgroundTransparency = 1
+TonTitle.Text = "💎 TON BATTLE HUB"
+TonTitle.TextColor3 = Color3.fromRGB(100, 200, 255)
+TonTitle.TextSize = 18
+TonTitle.Font = Enum.Font.GothamBold
+TonTitle.TextXAlignment = Enum.TextXAlignment.Left
+TonTitle.Parent = TonTopBar
+
+local TonBackBtn = Instance.new("TextButton")
+TonBackBtn.Size = UDim2.new(0, 70, 0, 30)
+TonBackBtn.Position = UDim2.new(1, -80, 0, 8)
+TonBackBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+TonBackBtn.Text = "← НАЗАД"
+TonBackBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+TonBackBtn.TextSize = 12
+TonBackBtn.Font = Enum.Font.GothamBold
+TonBackBtn.Parent = TonTopBar
+Instance.new("UICorner", TonBackBtn).CornerRadius = UDim.new(0, 6)
+
+local TonBalance = Instance.new("TextLabel")
+TonBalance.Size = UDim2.new(1, -20, 0, 30)
+TonBalance.Position = UDim2.new(0, 10, 0, 55)
+TonBalance.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+TonBalance.BorderSizePixel = 0
+TonBalance.Text = "💎 0  💠 0"
+TonBalance.TextColor3 = Color3.fromRGB(255, 255, 255)
+TonBalance.TextSize = 14
+TonBalance.Font = Enum.Font.Gotham
+TonBalance.Parent = TonMenu
+Instance.new("UICorner", TonBalance).CornerRadius = UDim.new(0, 6)
+
+-- Вкладки Ton Battle
+local TonTabs = {"💰", "🖼️", "⚔️", "🎰"}
+local TonTabNames = {"Валюта", "NFT", "Батл", "Рулетка"}
+local TonTabFrame = Instance.new("Frame")
+TonTabFrame.Size = UDim2.new(1, -20, 0, 35)
+TonTabFrame.Position = UDim2.new(0, 10, 0, 95)
+TonTabFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+TonTabFrame.BorderSizePixel = 0
+TonTabFrame.Parent = TonMenu
+
+local TonTabContent = {}
+local TonContentFrame = Instance.new("Frame")
+TonContentFrame.Size = UDim2.new(1, -20, 0, 280)
+TonContentFrame.Position = UDim2.new(0, 10, 0, 140)
+TonContentFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 28)
+TonContentFrame.BorderSizePixel = 0
+TonContentFrame.Parent = TonMenu
+Instance.new("UICorner", TonContentFrame).CornerRadius = UDim.new(0, 8)
+
+-- Создание вкладок Ton
+for i, tab in ipairs(TonTabs) do
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0, 70, 0, 30)
+    btn.Position = UDim2.new(0, (i-1)*75, 0, 3)
+    btn.BackgroundColor3 = i == 1 and Color3.fromRGB(50, 100, 200) or Color3.fromRGB(35, 35, 50)
+    btn.Text = tab
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.TextSize = 14
+    btn.Font = Enum.Font.Gotham
+    btn.Parent = TonTabFrame
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
+    
+    local content = Instance.new("Frame")
+    content.Size = UDim2.new(1, 0, 1, 0)
+    content.BackgroundTransparency = 1
+    content.Visible = i == 1
+    content.Parent = TonContentFrame
+    table.insert(TonTabContent, content)
+    
+    btn.MouseButton1Click:Connect(function()
+        for _, b in ipairs(TonTabFrame:GetChildren()) do
+            if b:IsA("TextButton") then b.BackgroundColor3 = Color3.fromRGB(35, 35, 50) end
+        end
+        btn.BackgroundColor3 = Color3.fromRGB(50, 100, 200)
+        for _, c in ipairs(TonTabContent) do c.Visible = false end
+        content.Visible = true
+    end)
+end
+
+-- Контент Ton Battle
+-- ВАЛЮТА
+local tonScroll = Instance.new("ScrollingFrame")
+tonScroll.Size = UDim2.new(1, -10, 1, -10)
+tonScroll.Position = UDim2.new(0, 5, 0, 5)
+tonScroll.BackgroundTransparency = 1
+tonScroll.BorderSizePixel = 0
+tonScroll.ScrollBarThickness = 3
+tonScroll.CanvasSize = UDim2.new(0, 0, 0, 120)
+tonScroll.Parent = TonTabContent[1]
+
+local y = 0
+for _, curr in ipairs({"_TONValue", "_GemsValue"}) do
+    local val = Player:FindFirstChild(curr)
+    if val then
+        local label = Instance.new("TextLabel")
+        label.Size = UDim2.new(0, 80, 0, 25)
+        label.Position = UDim2.new(0, 5, 0, y)
+        label.BackgroundTransparency = 1
+        label.Text = (curr == "_TONValue" and "💎 TON" or "💠 Gems") .. ":"
+        label.TextColor3 = Color3.fromRGB(200, 200, 200)
+        label.TextSize = 12
+        label.Font = Enum.Font.Gotham
+        label.TextXAlignment = Enum.TextXAlignment.Left
+        label.Parent = tonScroll
+        
+        local input = Instance.new("TextBox")
+        input.Size = UDim2.new(0, 150, 0, 25)
+        input.Position = UDim2.new(0, 90, 0, y)
+        input.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+        input.Text = tostring(val.Value)
+        input.TextColor3 = Color3.fromRGB(255, 255, 255)
+        input.TextSize = 12
+        input.Font = Enum.Font.Gotham
+        input.Parent = tonScroll
+        Instance.new("UICorner", input).CornerRadius = UDim.new(0, 4)
+        
+        local setBtn = Instance.new("TextButton")
+        setBtn.Size = UDim2.new(0, 40, 0, 25)
+        setBtn.Position = UDim2.new(0, 245, 0, y)
+        setBtn.BackgroundColor3 = Color3.fromRGB(50, 150, 50)
+        setBtn.Text = "✓"
+        setBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        setBtn.TextSize = 14
+        setBtn.Font = Enum.Font.GothamBold
+        setBtn.Parent = tonScroll
+        Instance.new("UICorner", setBtn).CornerRadius = UDim.new(0, 4)
+        
+        setBtn.MouseButton1Click:Connect(function()
+            local newVal = tonumber(input.Text)
+            if newVal then
+                val.Value = newVal
+                input.Text = tostring(val.Value)
+            end
+        end)
+        
+        y = y + 35
+    end
+end
+
+-- NFT (BestDrop)
+local nftScroll = Instance.new("ScrollingFrame")
+nftScroll.Size = UDim2.new(1, -10, 1, -10)
+nftScroll.Position = UDim2.new(0, 5, 0, 5)
+nftScroll.BackgroundTransparency = 1
+nftScroll.BorderSizePixel = 0
+nftScroll.ScrollBarThickness = 3
+nftScroll.CanvasSize = UDim2.new(0, 0, 0, 100)
+nftScroll.Parent = TonTabContent[2]
+
+local bestDrop = Player:FindFirstChild("_BestDrop")
+if bestDrop then
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(0, 100, 0, 25)
+    label.Position = UDim2.new(0, 5, 0, 0)
+    label.BackgroundTransparency = 1
+    label.Text = "Лучший дроп:"
+    label.TextColor3 = Color3.fromRGB(200, 200, 200)
+    label.TextSize = 12
+    label.Font = Enum.Font.Gotham
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.Parent = nftScroll
+    
+    local input = Instance.new("TextBox")
+    input.Size = UDim2.new(0, 180, 0, 25)
+    input.Position = UDim2.new(0, 5, 0, 30)
+    input.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+    input.Text = bestDrop.Value
+    input.TextColor3 = Color3.fromRGB(255, 255, 255)
+    input.TextSize = 11
+    input.Font = Enum.Font.Gotham
+    input.Parent = nftScroll
+    Instance.new("UICorner", input).CornerRadius = UDim.new(0, 4)
+    
+    local setBtn = Instance.new("TextButton")
+    setBtn.Size = UDim2.new(0, 60, 0, 25)
+    setBtn.Position = UDim2.new(0, 190, 0, 30)
+    setBtn.BackgroundColor3 = Color3.fromRGB(50, 150, 50)
+    setBtn.Text = "Уст."
+    setBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    setBtn.TextSize = 12
+    setBtn.Font = Enum.Font.GothamBold
+    setBtn.Parent = nftScroll
+    Instance.new("UICorner", setBtn).CornerRadius = UDim.new(0, 4)
+    
+    setBtn.MouseButton1Click:Connect(function()
+        bestDrop.Value = input.Text
+    end)
+end
+
+-- БАТЛ
+local battleScroll = Instance.new("ScrollingFrame")
+battleScroll.Size = UDim2.new(1, -10, 1, -10)
+battleScroll.Position = UDim2.new(0, 5, 0, 5)
+battleScroll.BackgroundTransparency = 1
+battleScroll.BorderSizePixel = 0
+battleScroll.ScrollBarThickness = 3
+battleScroll.CanvasSize = UDim2.new(0, 0, 0, 150)
+battleScroll.Parent = TonTabContent[3]
+
+local caseLabel = Instance.new("TextLabel")
+caseLabel.Size = UDim2.new(0, 80, 0, 25)
+caseLabel.Position = UDim2.new(0, 5, 0, 0)
+caseLabel.BackgroundTransparency = 1
+caseLabel.Text = "Кейс:"
+caseLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+caseLabel.TextSize = 12
+caseLabel.Font = Enum.Font.Gotham
+caseLabel.TextXAlignment = Enum.TextXAlignment.Left
+caseLabel.Parent = battleScroll
+
+local caseInput = Instance.new("TextBox")
+caseInput.Size = UDim2.new(0, 180, 0, 25)
+caseInput.Position = UDim2.new(0, 5, 0, 30)
+caseInput.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+caseInput.PlaceholderText = "Название кейса"
+caseInput.Text = "Cirque"
+caseInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+caseInput.TextSize = 11
+caseInput.Font = Enum.Font.Gotham
+caseInput.Parent = battleScroll
+Instance.new("UICorner", caseInput).CornerRadius = UDim.new(0, 4)
+
+local countLabel = Instance.new("TextLabel")
+countLabel.Size = UDim2.new(0, 100, 0, 25)
+countLabel.Position = UDim2.new(0, 5, 0, 65)
+countLabel.BackgroundTransparency = 1
+countLabel.Text = "Кол-во (1-10):"
+countLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+countLabel.TextSize = 12
+countLabel.Font = Enum.Font.Gotham
+countLabel.TextXAlignment = Enum.TextXAlignment.Left
+countLabel.Parent = battleScroll
+
+local countInput = Instance.new("TextBox")
+countInput.Size = UDim2.new(0, 80, 0, 25)
+countInput.Position = UDim2.new(0, 5, 0, 95)
+countInput.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+countInput.Text = "1"
+countInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+countInput.TextSize = 11
+countInput.Font = Enum.Font.Gotham
+countInput.Parent = battleScroll
+Instance.new("UICorner", countInput).CornerRadius = UDim.new(0, 4)
+
+local createBtn = Instance.new("TextButton")
+createBtn.Size = UDim2.new(1, -10, 0, 35)
+createBtn.Position = UDim2.new(0, 5, 0, 130)
+createBtn.BackgroundColor3 = Color3.fromRGB(200, 100, 50)
+createBtn.Text = "⚔️ СОЗДАТЬ БАТЛ"
+createBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+createBtn.TextSize = 13
+createBtn.Font = Enum.Font.GothamBold
+createBtn.Parent = battleScroll
+Instance.new("UICorner", createBtn).CornerRadius = UDim.new(0, 6)
+
+createBtn.MouseButton1Click:Connect(function()
+    local caseName = caseInput.Text
+    local count = tonumber(countInput.Text) or 1
+    count = math.clamp(count, 1, 10)
+    local cases = {}
+    for i = 1, count do table.insert(cases, caseName) end
+    local Battles = RS.Events.Battles
+    if Battles then Battles:InvokeServer("Create", cases, {}) end
+end)
+
+-- РУЛЕТКА
+local rouletteScroll = Instance.new("ScrollingFrame")
+rouletteScroll.Size = UDim2.new(1, -10, 1, -10)
+rouletteScroll.Position = UDim2.new(0, 5, 0, 5)
+rouletteScroll.BackgroundTransparency = 1
+rouletteScroll.BorderSizePixel = 0
+rouletteScroll.ScrollBarThickness = 3
+rouletteScroll.CanvasSize = UDim2.new(0, 0, 0, 80)
+rouletteScroll.Parent = TonTabContent[4]
+
+local rouletteBtn = Instance.new("TextButton")
+rouletteBtn.Size = UDim2.new(1, -10, 0, 50)
+rouletteBtn.Position = UDim2.new(0, 5, 0, 10)
+rouletteBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+rouletteBtn.Text = "🎰 ОТКРЫТЬ РУЛЕТКУ"
+rouletteBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+rouletteBtn.TextSize = 14
+rouletteBtn.Font = Enum.Font.GothamBold
+rouletteBtn.Parent = rouletteScroll
+Instance.new("UICorner", rouletteBtn).CornerRadius = UDim.new(0, 8)
+
+rouletteBtn.MouseButton1Click:Connect(function()
+    local PlayerGui = Player:WaitForChild("PlayerGui")
+    local MainGui = PlayerGui:FindFirstChild("MainGui")
+    if MainGui then
+        local Pages = MainGui:FindFirstChild("Pages")
+        if Pages then
+            local fusePage = Pages:FindFirstChild("Fuse")
+            local craftPage = Pages:FindFirstChild("Crafts")
+            if fusePage then fusePage.Visible = true
+            elseif craftPage then craftPage.Visible = true end
+            MainGui.Visible = true
+        end
+    end
+end)
+
+-- =============================================
+-- МЕНЮ NFT BATTLE (ВСЕ ФУНКЦИИ)
+-- =============================================
+local NftMenu = Instance.new("Frame")
+NftMenu.Size = UDim2.new(0, 350, 0, 480)
+NftMenu.Position = UDim2.new(0.5, -175, 0.5, -240)
+NftMenu.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
+NftMenu.BorderSizePixel = 0
+NftMenu.Active = true
+NftMenu.Draggable = true
+NftMenu.Visible = false
+NftMenu.Parent = Hub
+Instance.new("UICorner", NftMenu).CornerRadius = UDim.new(0, 12)
+
+local NftTopBar = Instance.new("Frame")
+NftTopBar.Size = UDim2.new(1, 0, 0, 45)
+NftTopBar.BackgroundColor3 = Color3.fromRGB(25, 25, 40)
+NftTopBar.BorderSizePixel = 0
+NftTopBar.Parent = NftMenu
+Instance.new("UICorner", NftTopBar).CornerRadius = UDim.new(0, 12)
+
+local NftTitle = Instance.new("TextLabel")
+NftTitle.Size = UDim2.new(0, 200, 1, 0)
+NftTitle.Position = UDim2.new(0, 15, 0, 0)
+NftTitle.BackgroundTransparency = 1
+NftTitle.Text = "🖼️ NFT BATTLE HUB"
+NftTitle.TextColor3 = Color3.fromRGB(255, 150, 150)
+NftTitle.TextSize = 18
+NftTitle.Font = Enum.Font.GothamBold
+NftTitle.TextXAlignment = Enum.TextXAlignment.Left
+NftTitle.Parent = NftTopBar
+
+local NftBackBtn = Instance.new("TextButton")
+NftBackBtn.Size = UDim2.new(0, 70, 0, 30)
+NftBackBtn.Position = UDim2.new(1, -80, 0, 8)
+NftBackBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+NftBackBtn.Text = "← НАЗАД"
+NftBackBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+NftBackBtn.TextSize = 12
+NftBackBtn.Font = Enum.Font.GothamBold
+NftBackBtn.Parent = NftTopBar
+Instance.new("UICorner", NftBackBtn).CornerRadius = UDim.new(0, 6)
+
+local NftBalance = Instance.new("TextLabel")
+NftBalance.Size = UDim2.new(1, -20, 0, 30)
+NftBalance.Position = UDim2.new(0, 10, 0, 55)
+NftBalance.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+NftBalance.BorderSizePixel = 0
+NftBalance.Text = "⭐ 0  💎 0  💠 0  ❄️ 0"
+NftBalance.TextColor3 = Color3.fromRGB(255, 255, 255)
+NftBalance.TextSize = 11
+NftBalance.Font = Enum.Font.Gotham
+NftBalance.Parent = NftMenu
+Instance.new("UICorner", NftBalance).CornerRadius = UDim.new(0, 6)
+
+-- Вкладки NFT Battle
+local NftTabs = {"💰", "🖼️", "🛒", "📋", "👻", "🎰", "⚔️", "🔥"}
+local NftTabFrame = Instance.new("Frame")
+NftTabFrame.Size = UDim2.new(1, -20, 0, 35)
+NftTabFrame.Position = UDim2.new(0, 10, 0, 95)
+NftTabFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+NftTabFrame.BorderSizePixel = 0
+NftTabFrame.Parent = NftMenu
+
+local NftTabContent = {}
+local NftContentFrame = Instance.new("Frame")
+NftContentFrame.Size = UDim2.new(1, -20, 0, 310)
+NftContentFrame.Position = UDim2.new(0, 10, 0, 140)
+NftContentFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 28)
+NftContentFrame.BorderSizePixel = 0
+NftContentFrame.Parent = NftMenu
+Instance.new("UICorner", NftContentFrame).CornerRadius = UDim.new(0, 8)
+
+-- Создание вкладок NFT
+for i, tab in ipairs(NftTabs) do
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0, 38, 0, 30)
+    btn.Position = UDim2.new(0, (i-1)*40, 0, 3)
+    btn.BackgroundColor3 = i == 1 and Color3.fromRGB(50, 100, 200) or Color3.fromRGB(35, 35, 50)
+    btn.Text = tab
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.TextSize = 12
+    btn.Font = Enum.Font.Gotham
+    btn.Parent = NftTabFrame
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
+    
+    local content = Instance.new("Frame")
+    content.Size = UDim2.new(1, 0, 1, 0)
+    content.BackgroundTransparency = 1
+    content.Visible = i == 1
+    content.Parent = NftContentFrame
+    table.insert(NftTabContent, content)
+    
+    btn.MouseButton1Click:Connect(function()
+        for _, b in ipairs(NftTabFrame:GetChildren()) do
+            if b:IsA("TextButton") then b.BackgroundColor3 = Color3.fromRGB(35, 35, 50) end
+        end
+        btn.BackgroundColor3 = Color3.fromRGB(50, 100, 200)
+        for _, c in ipairs(NftTabContent) do c.Visible = false end
+        content.Visible = true
+    end)
+end
+
+-- КОНТЕНТ NFT BATTLE (копируем из предыдущего хаба, сокращённо)
+-- ВАЛЮТА
+local nftValScroll = Instance.new("ScrollingFrame")
+nftValScroll.Size = UDim2.new(1, -10, 1, -10)
+nftValScroll.Position = UDim2.new(0, 5, 0, 5)
+nftValScroll.BackgroundTransparency = 1
+nftValScroll.BorderSizePixel = 0
+nftValScroll.ScrollBarThickness = 3
+nftValScroll.CanvasSize = UDim2.new(0, 0, 0, 200)
+nftValScroll.Parent = NftTabContent[1]
+
+y = 0
+for _, curr in ipairs({"_StarsValue", "_TONValue", "_GemsValue", "_SnowflakesValue"}) do
+    local val = Player:FindFirstChild(curr)
+    if val then
+        local label = Instance.new("TextLabel")
+        label.Size = UDim2.new(0, 80, 0, 25)
+        label.Position = UDim2.new(0, 5, 0, y)
+        label.BackgroundTransparency = 1
+        label.Text = (curr == "_StarsValue" and "⭐ Stars" or curr == "_TONValue" and "💎 TON" or curr == "_GemsValue" and "💠 Gems" or "❄️ Snow") .. ":"
+        label.TextColor3 = Color3.fromRGB(200, 200, 200)
+        label.TextSize = 11
+        label.Font = Enum.Font.Gotham
+        label.TextXAlignment = Enum.TextXAlignment.Left
+        label.Parent = nftValScroll
+        
+        local input = Instance.new("TextBox")
+        input.Size = UDim2.new(0, 140, 0, 25)
+        input.Position = UDim2.new(0, 90, 0, y)
+        input.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+        input.Text = tostring(val.Value)
+        input.TextColor3 = Color3.fromRGB(255, 255, 255)
+        input.TextSize = 11
+        input.Font = Enum.Font.Gotham
+        input.Parent = nftValScroll
+        Instance.new("UICorner", input).CornerRadius = UDim.new(0, 4)
+        
+        local setBtn = Instance.new("TextButton")
+        setBtn.Size = UDim2.new(0, 40, 0, 25)
+        setBtn.Position = UDim2.new(0, 235, 0, y)
+        setBtn.BackgroundColor3 = Color3.fromRGB(50, 150, 50)
+        setBtn.Text = "✓"
+        setBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        setBtn.TextSize = 14
+        setBtn.Font = Enum.Font.GothamBold
+        setBtn.Parent = nftValScroll
+        Instance.new("UICorner", setBtn).CornerRadius = UDim.new(0, 4)
+        
+        setBtn.MouseButton1Click:Connect(function()
+            local newVal = tonumber(input.Text)
+            if newVal then
+                val.Value = newVal
+                input.Text = tostring(val.Value)
+            end
+        end)
+        
+        y = y + 35
+    end
+end
+
+-- NFT (BestDrop, добавить, индекс)
+local nftNftScroll = Instance.new("ScrollingFrame")
+nftNftScroll.Size = UDim2.new(1, -10, 1, -10)
+nftNftScroll.Position = UDim2.new(0, 5, 0, 5)
+nftNftScroll.BackgroundTransparency = 1
+nftNftScroll.BorderSizePixel = 0
+nftNftScroll.ScrollBarThickness = 3
+nftNftScroll.CanvasSize = UDim2.new(0, 0, 0, 250)
+nftNftScroll.Parent = NftTabContent[2]
+
+y = 0
+local bestDrop2 = Player:FindFirstChild("_BestDrop")
+if bestDrop2 then
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(0, 100, 0, 25)
+    label.Position = UDim2.new(0, 5, 0, y)
+    label.BackgroundTransparency = 1
+    label.Text = "Лучший дроп:"
+    label.TextColor3 = Color3.fromRGB(200, 200, 200)
+    label.TextSize = 12
+    label.Font = Enum.Font.Gotham
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.Parent = nftNftScroll
+    
+    local input = Instance.new("TextBox")
+    input.Size = UDim2.new(0, 180, 0, 25)
+    input.Position = UDim2.new(0, 5, 0, y+25)
+    input.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+    input.Text = bestDrop2.Value
+    input.TextColor3 = Color3.fromRGB(255, 255, 255)
+    input.TextSize = 11
+    input.Font = Enum.Font.Gotham
+    input.Parent = nftNftScroll
+    Instance.new("UICorner", input).CornerRadius = UDim.new(0, 4)
+    
+    local setBtn = Instance.new("TextButton")
+    setBtn.Size = UDim2.new(0, 60, 0, 25)
+    setBtn.Position = UDim2.new(0, 190, 0, y+25)
+    setBtn.BackgroundColor3 = Color3.fromRGB(50, 150, 50)
+    setBtn.Text = "Уст."
+    setBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    setBtn.TextSize = 12
+    setBtn.Font = Enum.Font.GothamBold
+    setBtn.Parent = nftNftScroll
+    Instance.new("UICorner", setBtn).CornerRadius = UDim.new(0, 4)
+    
+    setBtn.MouseButton1Click:Connect(function()
+        bestDrop2.Value = input.Text
+    end)
+    
+    y = y + 60
+end
+
+-- Добавить NFT
+local addLabel = Instance.new("TextLabel")
+addLabel.Size = UDim2.new(1, -10, 0, 25)
+addLabel.Position = UDim2.new(0, 5, 0, y)
+addLabel.BackgroundTransparency = 1
+addLabel.Text = "Добавить NFT:"
+addLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+addLabel.TextSize = 12
+addLabel.Font = Enum.Font.GothamBold
+addLabel.TextXAlignment = Enum.TextXAlignment.Left
+addLabel.Parent = nftNftScroll
+
+y = y + 28
+
+local nftName = Instance.new("TextBox")
+nftName.Size = UDim2.new(0, 150, 0, 28)
+nftName.Position = UDim2.new(0, 5, 0, y)
+nftName.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+nftName.PlaceholderText = "Название"
+nftName.Text = ""
+nftName.TextColor3 = Color3.fromRGB(255, 255, 255)
+nftName.TextSize = 11
+nftName.Font = Enum.Font.Gotham
+nftName.Parent = nftNftScroll
+Instance.new("UICorner", nftName).CornerRadius = UDim.new(0, 4)
+
+local nftCount = Instance.new("TextBox")
+nftCount.Size = UDim2.new(0, 60, 0, 28)
+nftCount.Position = UDim2.new(0, 160, 0, y)
+nftCount.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+nftCount.PlaceholderText = "Кол-во"
+nftCount.Text = "1"
+nftCount.TextColor3 = Color3.fromRGB(255, 255, 255)
+nftCount.TextSize = 11
+nftCount.Font = Enum.Font.Gotham
+nftCount.Parent = nftNftScroll
+Instance.new("UICorner", nftCount).CornerRadius = UDim.new(0, 4)
+
+local addBtn = Instance.new("TextButton")
+addBtn.Size = UDim2.new(0, 50, 0, 28)
+addBtn.Position = UDim2.new(0, 225, 0, y)
+addBtn.BackgroundColor3 = Color3.fromRGB(50, 100, 200)
+addBtn.Text = "Доб."
+addBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+addBtn.TextSize = 11
+addBtn.Font = Enum.Font.GothamBold
+addBtn.Parent = nftNftScroll
+Instance.new("UICorner", addBtn).CornerRadius = UDim.new(0, 4)
+
+addBtn.MouseButton1Click:Connect(function()
+    local inv = Player:FindFirstChild("_Inventory")
+    if inv and nftName.Text ~= "" then
+        local count = tonumber(nftCount.Text) or 1
+        for i = 1, count do
+            local item = Instance.new("StringValue")
+            item.Name = nftName.Text
+            item.Parent = inv
+        end
+    end
+end)
+
+y = y + 38
+
+-- Индекс
+local idxLabel = Instance.new("TextLabel")
+idxLabel.Size = UDim2.new(1, -10, 0, 25)
+idxLabel.Position = UDim2.new(0, 5, 0, y)
+idxLabel.BackgroundTransparency = 1
+idxLabel.Text = "Изменить Индекс:"
+idxLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+idxLabel.TextSize = 12
+idxLabel.Font = Enum.Font.GothamBold
+idxLabel.TextXAlignment = Enum.TextXAlignment.Left
+idxLabel.Parent = nftNftScroll
+
+y = y + 28
+
+local idxName = Instance.new("TextBox")
+idxName.Size = UDim2.new(0, 150, 0, 28)
+idxName.Position = UDim2.new(0, 5, 0, y)
+idxName.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+idxName.PlaceholderText = "Название"
+idxName.Text = ""
+idxName.TextColor3 = Color3.fromRGB(255, 255, 255)
+idxName.TextSize = 11
+idxName.Font = Enum.Font.Gotham
+idxName.Parent = nftNftScroll
+Instance.new("UICorner", idxName).CornerRadius = UDim.new(0, 4)
+
+local idxVal = Instance.new("TextBox")
+idxVal.Size = UDim2.new(0, 60, 0, 28)
+idxVal.Position = UDim2.new(0, 160, 0, y)
+idxVal.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+idxVal.PlaceholderText = "Знач."
+idxVal.Text = "1"
+idxVal.TextColor3 = Color3.fromRGB(255, 255, 255)
+idxVal.TextSize = 11
+idxVal.Font = Enum.Font.Gotham
+idxVal.Parent = nftNftScroll
+Instance.new("UICorner", idxVal).CornerRadius = UDim.new(0, 4)
+
+local setIdx = Instance.new("TextButton")
+setIdx.Size = UDim2.new(0, 50, 0, 28)
+setIdx.Position = UDim2.new(0, 225, 0, y)
+setIdx.BackgroundColor3 = Color3.fromRGB(50, 100, 200)
+setIdx.Text = "Уст."
+setIdx.TextColor3 = Color3.fromRGB(255, 255, 255)
+setIdx.TextSize = 11
+setIdx.Font = Enum.Font.GothamBold
+setIdx.Parent = nftNftScroll
+Instance.new("UICorner", setIdx).CornerRadius = UDim.new(0, 4)
+
+setIdx.MouseButton1Click:Connect(function()
+    local idx = Player:FindFirstChild("_Index")
+    if idx and idxName.Text ~= "" then
+        local item = idx:FindFirstChild(idxName.Text) or Instance.new("IntValue", idx)
+        item.Name = idxName.Text
+        item.Value = tonumber(idxVal.Text) or 1
+    end
+end)
+
+-- ШОП
+local shopScroll = Instance.new("ScrollingFrame")
+shopScroll.Size = UDim2.new(1, -10, 1, -10)
+shopScroll.Position = UDim2.new(0, 5, 0, 5)
+shopScroll.BackgroundTransparency = 1
+shopScroll.BorderSizePixel = 0
+shopScroll.ScrollBarThickness = 3
+shopScroll.CanvasSize = UDim2.new(0, 0, 0, 250)
+shopScroll.Parent = NftTabContent[3]
+
+y = 0
+local shopBtns = {
+    {"🍀 Запустить удачу", Color3.fromRGB(50, 150, 50), function()
+        local LuckValue = RS:FindFirstChild("LuckValue")
+        local LuckValue2 = RS:FindFirstChild("LuckValue2")
+        local CrossValue = RS:FindFirstChild("CrossValue")
+        if LuckValue then LuckValue.Value = 99999 end
+        if LuckValue2 then LuckValue2.Value = 99999 end
+        if CrossValue then CrossValue.Value = 99999 end
+        local lp1 = Player:FindFirstChild("_LuckyPotion")
+        local lp2 = Player:FindFirstChild("_LuckyPotion2")
+        if lp1 then lp1.Value = 99999 end
+        if lp2 then lp2.Value = 99999 end
+    end},
+    {"⚡ Fast Upgrade", Color3.fromRGB(200, 150, 50), function()
+        local pass = Player:FindFirstChild("_1628441770") or Instance.new("NumberValue", Player)
+        pass.Name = "_1628441770"
+        pass.Value = 1
+    end},
+    {"📦 Auto Open", Color3.fromRGB(50, 100, 200), function()
+        local pass = Player:FindFirstChild("_1651738174") or Instance.new("NumberValue", Player)
+        pass.Name = "_1651738174"
+        pass.Value = 1
+    end},
+    {"👑 Premium BP", Color3.fromRGB(200, 100, 200), function()
+        local pass = Player:FindFirstChild("_1640776898") or Instance.new("NumberValue", Player)
+        pass.Name = "_1640776898"
+        pass.Value = 1
+        local prem = Player:FindFirstChild("_BPPremium")
+        if prem then prem.Value = 1 end
+    end}
+}
+
+for _, btn in ipairs(shopBtns) do
+    local b = Instance.new("TextButton")
+    b.Size = UDim2.new(1, -10, 0, 40)
+    b.Position = UDim2.new(0, 5, 0, y)
+    b.BackgroundColor3 = btn[2]
+    b.Text = btn[1]
+    b.TextColor3 = Color3.fromRGB(255, 255, 255)
+    b.TextSize = 13
+    b.Font = Enum.Font.GothamBold
+    b.Parent = shopScroll
+    Instance.new("UICorner", b).CornerRadius = UDim.new(0, 6)
+    b.MouseButton1Click:Connect(btn[3])
+    y = y + 48
+end
+
+-- БАТЛ ПАСС
+local bpScroll = Instance.new("ScrollingFrame")
+bpScroll.Size = UDim2.new(1, -10, 1, -10)
+bpScroll.Position = UDim2.new(0, 5, 0, 5)
+bpScroll.BackgroundTransparency = 1
+bpScroll.BorderSizePixel = 0
+bpScroll.ScrollBarThickness = 3
+bpScroll.CanvasSize = UDim2.new(0, 0, 0, 250)
+bpScroll.Parent = NftTabContent[4]
+
+y = 0
+local bpLevel = Player:FindFirstChild("_BPLevel")
+if bpLevel then
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(0, 80, 0, 25)
+    label.Position = UDim2.new(0, 5, 0, y)
+    label.BackgroundTransparency = 1
+    label.Text = "Уровень:"
+    label.TextColor3 = Color3.fromRGB(200, 200, 200)
+    label.TextSize = 12
+    label.Font = Enum.Font.Gotham
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.Parent = bpScroll
+    
+    local input = Instance.new("TextBox")
+    input.Size = UDim2.new(0, 100, 0, 25)
+    input.Position = UDim2.new(0, 90, 0, y)
+    input.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+    input.Text = tostring(bpLevel.Value)
+    input.TextColor3 = Color3.fromRGB(255, 255, 255)
+    input.TextSize = 12
+    input.Font = Enum.Font.Gotham
+    input.Parent = bpScroll
+    Instance.new("UICorner", input).CornerRadius = UDim.new(0, 4)
+    
+    local setBtn = Instance.new("TextButton")
+    setBtn.Size = UDim2.new(0, 40, 0, 25)
+    setBtn.Position = UDim2.new(0, 195, 0, y)
+    setBtn.BackgroundColor3 = Color3.fromRGB(50, 150, 50)
+    setBtn.Text = "✓"
+    setBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    setBtn.TextSize = 14
+    setBtn.Font = Enum.Font.GothamBold
+    setBtn.Parent = bpScroll
+    Instance.new("UICorner", setBtn).CornerRadius = UDim.new(0, 4)
+    
+    setBtn.MouseButton1Click:Connect(function()
+        local val = tonumber(input.Text)
+        if val then
+            bpLevel.Value = math.clamp(val, 1, 50)
+            input.Text = tostring(bpLevel.Value)
+        end
+    end)
+    
+    y = y + 35
+end
+
+local resetBpBtn = Instance.new("TextButton")
+resetBpBtn.Size = UDim2.new(1, -10, 0, 40)
+resetBpBtn.Position = UDim2.new(0, 5, 0, y+5)
+resetBpBtn.BackgroundColor3 = Color3.fromRGB(200, 100, 50)
+resetBpBtn.Text = "🔄 Сбросить награды"
+resetBpBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+resetBpBtn.TextSize = 13
+resetBpBtn.Font = Enum.Font.GothamBold
+resetBpBtn.Parent = bpScroll
+Instance.new("UICorner", resetBpBtn).CornerRadius = UDim.new(0, 6)
+
+resetBpBtn.MouseButton1Click:Connect(function()
+    local claimed = Player:FindFirstChild("_BPClaimed")
+    if claimed then
+        for _, v in ipairs(claimed:GetChildren()) do
+            if v:IsA("BoolValue") then v.Value = false end
+        end
+    end
+end)
+
+-- СКРЫТЬ NFT
+local hideScroll = Instance.new("ScrollingFrame")
+hideScroll.Size = UDim2.new(1, -10, 1, -10)
+hideScroll.Position = UDim2.new(0, 5, 0, 5)
+hideScroll.BackgroundTransparency = 1
+hideScroll.BorderSizePixel = 0
+hideScroll.ScrollBarThickness = 3
+hideScroll.CanvasSize = UDim2.new(0, 0, 0, 300)
+hideScroll.Parent = NftTabContent[5]
+
+y = 0
+local showAllBtn = Instance.new("TextButton")
+showAllBtn.Size = UDim2.new(1, -10, 0, 35)
+showAllBtn.Position = UDim2.new(0, 5, 0, y)
+showAllBtn.BackgroundColor3 = Color3.fromRGB(50, 150, 50)
+showAllBtn.Text = "👁️ Показать всё"
+showAllBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+showAllBtn.TextSize = 13
+showAllBtn.Font = Enum.Font.GothamBold
+showAllBtn.Parent = hideScroll
+Instance.new("UICorner", showAllBtn).CornerRadius = UDim.new(0, 6)
+
+showAllBtn.MouseButton1Click:Connect(function()
+    local inv = Player:FindFirstChild("_Inventory")
+    if inv then
+        for _, item in ipairs(inv:GetChildren()) do
+            item:SetAttribute("Hidden", nil)
+        end
+    end
+end)
+
+y = y + 45
+
+local inv = Player:FindFirstChild("_Inventory")
+if inv then
+    for _, item in ipairs(inv:GetChildren()) do
+        local hidden = item:GetAttribute("Hidden")
+        local itemBtn = Instance.new("TextButton")
+        itemBtn.Size = UDim2.new(1, -10, 0, 28)
+        itemBtn.Position = UDim2.new(0, 5, 0, y)
+        itemBtn.BackgroundColor3 = hidden and Color3.fromRGB(150, 50, 50) or Color3.fromRGB(40, 40, 50)
+        itemBtn.Text = item.Name .. (hidden and " (Скрыто)" or "")
+        itemBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        itemBtn.TextSize = 10
+        itemBtn.Font = Enum.Font.Gotham
+        itemBtn.Parent = hideScroll
+        Instance.new("UICorner", itemBtn).CornerRadius = UDim.new(0, 4)
+        
+        itemBtn.MouseButton1Click:Connect(function()
+            local newState = not item:GetAttribute("Hidden")
+            item:SetAttribute("Hidden", newState or nil)
+            itemBtn.BackgroundColor3 = newState and Color3.fromRGB(150, 50, 50) or Color3.fromRGB(40, 40, 50)
+            itemBtn.Text = item.Name .. (newState and " (Скрыто)" or "")
+        end)
+        
+        y = y + 33
+    end
+end
+
+hideScroll.CanvasSize = UDim2.new(0, 0, 0, y + 10)
+
+-- РУЛЕТКА
+local nftRouletteScroll = Instance.new("ScrollingFrame")
+nftRouletteScroll.Size = UDim2.new(1, -10, 1, -10)
+nftRouletteScroll.Position = UDim2.new(0, 5, 0, 5)
+nftRouletteScroll.BackgroundTransparency = 1
+nftRouletteScroll.BorderSizePixel = 0
+nftRouletteScroll.ScrollBarThickness = 3
+nftRouletteScroll.CanvasSize = UDim2.new(0, 0, 0, 80)
+nftRouletteScroll.Parent = NftTabContent[6]
+
+local nftRouletteBtn = Instance.new("TextButton")
+nftRouletteBtn.Size = UDim2.new(1, -10, 0, 50)
+nftRouletteBtn.Position = UDim2.new(0, 5, 0, 10)
+nftRouletteBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+nftRouletteBtn.Text = "🎰 ОТКРЫТЬ РУЛЕТКУ"
+nftRouletteBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+nftRouletteBtn.TextSize = 14
+nftRouletteBtn.Font = Enum.Font.GothamBold
+nftRouletteBtn.Parent = nftRouletteScroll
+Instance.new("UICorner", nftRouletteBtn).CornerRadius = UDim.new(0, 8)
+
+nftRouletteBtn.MouseButton1Click:Connect(function()
+    local PlayerGui = Player:WaitForChild("PlayerGui")
+    local MainGui = PlayerGui:FindFirstChild("MainGui")
+    if MainGui then
+        local Pages = MainGui:FindFirstChild("Pages")
+        if Pages then
+            local fusePage = Pages:FindFirstChild("Fuse")
+            local craftPage = Pages:FindFirstChild("Crafts")
+            if fusePage then fusePage.Visible = true
+            elseif craftPage then craftPage.Visible = true end
+            MainGui.Visible = true
+        end
+    end
+end)
+
+-- БАТЛ
+local nftBattleScroll = Instance.new("ScrollingFrame")
+nftBattleScroll.Size = UDim2.new(1, -10, 1, -10)
+nftBattleScroll.Position = UDim2.new(0, 5, 0, 5)
+nftBattleScroll.BackgroundTransparency = 1
+nftBattleScroll.BorderSizePixel = 0
+nftBattleScroll.ScrollBarThickness = 3
+nftBattleScroll.CanvasSize = UDim2.new(0, 0, 0, 180)
+nftBattleScroll.Parent = NftTabContent[7]
+
+y = 0
+local caseLabel2 = Instance.new("TextLabel")
+caseLabel2.Size = UDim2.new(0, 80, 0, 25)
+caseLabel2.Position = UDim2.new(0, 5, 0, y)
+caseLabel2.BackgroundTransparency = 1
+caseLabel2.Text = "Кейс:"
+caseLabel2.TextColor3 = Color3.fromRGB(200, 200, 200)
+caseLabel2.TextSize = 12
+caseLabel2.Font = Enum.Font.Gotham
+caseLabel2.TextXAlignment = Enum.TextXAlignment.Left
+caseLabel2.Parent = nftBattleScroll
+
+local caseInput2 = Instance.new("TextBox")
+caseInput2.Size = UDim2.new(0, 180, 0, 25)
+caseInput2.Position = UDim2.new(0, 5, 0, y+25)
+caseInput2.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+caseInput2.PlaceholderText = "Название кейса"
+caseInput2.Text = "Cirque"
+caseInput2.TextColor3 = Color3.fromRGB(255, 255, 255)
+caseInput2.TextSize = 11
+caseInput2.Font = Enum.Font.Gotham
+caseInput2.Parent = nftBattleScroll
+Instance.new("UICorner", caseInput2).CornerRadius = UDim.new(0, 4)
+
+y = y + 60
+
+local countLabel2 = Instance.new("TextLabel")
+countLabel2.Size = UDim2.new(0, 100, 0, 25)
+countLabel2.Position = UDim2.new(0, 5, 0, y)
+countLabel2.BackgroundTransparency = 1
+countLabel2.Text = "Кол-во (1-10):"
+countLabel2.TextColor3 = Color3.fromRGB(200, 200, 200)
+countLabel2.TextSize = 12
+countLabel2.Font = Enum.Font.Gotham
+countLabel2.TextXAlignment = Enum.TextXAlignment.Left
+countLabel2.Parent = nftBattleScroll
+
+local countInput2 = Instance.new("TextBox")
+countInput2.Size = UDim2.new(0, 80, 0, 25)
+countInput2.Position = UDim2.new(0, 5, 0, y+25)
+countInput2.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+countInput2.Text = "1"
+countInput2.TextColor3 = Color3.fromRGB(255, 255, 255)
+countInput2.TextSize = 11
+countInput2.Font = Enum.Font.Gotham
+countInput2.Parent = nftBattleScroll
+Instance.new("UICorner", countInput2).CornerRadius = UDim.new(0, 4)
+
+y = y + 60
+
+local createBtn2 = Instance.new("TextButton")
+createBtn2.Size = UDim2.new(1, -10, 0, 40)
+createBtn2.Position = UDim2.new(0, 5, 0, y)
+createBtn2.BackgroundColor3 = Color3.fromRGB(200, 100, 50)
+createBtn2.Text = "⚔️ СОЗДАТЬ БАТЛ"
+createBtn2.TextColor3 = Color3.fromRGB(255, 255, 255)
+createBtn2.TextSize = 14
+createBtn2.Font = Enum.Font.GothamBold
+createBtn2.Parent = nftBattleScroll
+Instance.new("UICorner", createBtn2).CornerRadius = UDim.new(0, 6)
+
+createBtn2.MouseButton1Click:Connect(function()
+    local caseName = caseInput2.Text
+    local count = tonumber(countInput2.Text) or 1
+    count = math.clamp(count, 1, 10)
+    local cases = {}
+    for i = 1, count do table.insert(cases, caseName) end
+    local Battles = RS.Events.Battles
+    if Battles then Battles:InvokeServer("Create", cases, {}) end
+end)
+
+-- ФЬЮЗ
+local fuseScroll = Instance.new("ScrollingFrame")
+fuseScroll.Size = UDim2.new(1, -10, 1, -10)
+fuseScroll.Position = UDim2.new(0, 5, 0, 5)
+fuseScroll.BackgroundTransparency = 1
+fuseScroll.BorderSizePixel = 0
+fuseScroll.ScrollBarThickness = 3
+fuseScroll.CanvasSize = UDim2.new(0, 0, 0, 150)
+fuseScroll.Parent = NftTabContent[8]
+
+y = 0
+local debugToggle = false
+
+local debugBtn = Instance.new("TextButton")
+debugBtn.Size = UDim2.new(1, -10, 0, 40)
+debugBtn.Position = UDim2.new(0, 5, 0, y)
+debugBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+debugBtn.Text = "🐛 Debug Mode: ВЫКЛ"
+debugBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+debugBtn.TextSize = 13
+debugBtn.Font = Enum.Font.GothamBold
+debugBtn.Parent = fuseScroll
+Instance.new("UICorner", debugBtn).CornerRadius = UDim.new(0, 6)
+
+debugBtn.MouseButton1Click:Connect(function()
+    debugToggle = not debugToggle
+    debugBtn.BackgroundColor3 = debugToggle and Color3.fromRGB(50, 200, 50) or Color3.fromRGB(50, 50, 50)
+    debugBtn.Text = debugToggle and "🐛 Debug Mode: ВКЛ" or "🐛 Debug Mode: ВЫКЛ"
+end)
+
+y = y + 50
+
+local fuseBtn = Instance.new("TextButton")
+fuseBtn.Size = UDim2.new(1, -10, 0, 50)
+fuseBtn.Position = UDim2.new(0, 5, 0, y)
+fuseBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 150)
+fuseBtn.Text = "🔥 ЗАПУСТИТЬ ФЬЮЗ"
+fuseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+fuseBtn.TextSize = 14
+fuseBtn.Font = Enum.Font.GothamBold
+fuseBtn.Parent = fuseScroll
+Instance.new("UICorner", fuseBtn).CornerRadius = UDim.new(0, 8)
+
+fuseBtn.MouseButton1Click:Connect(function()
+    local inv = Player:FindFirstChild("_Inventory")
+    if inv then
+        local items = {}
+        for _, item in ipairs(inv:GetChildren()) do
+            if #items < 5 and not item:GetAttribute("Unique") then
+                table.insert(items, item)
+            end
+        end
+        if #items == 5 then
+            local Fuse = RS.Events.Fuse
+            if Fuse then
+                Fuse:InvokeServer("Fuse", items, debugToggle)
+            end
+        end
+    end
+end)
+
+-- =============================================
+-- ПОДКЛЮЧЕНИЕ КНОПОК ГЛАВНОГО МЕНЮ
+-- =============================================
+TonButton.MouseButton1Click:Connect(function()
+    MainMenu.Visible = false
+    TonMenu.Visible = true
+end)
+
+NftButton.MouseButton1Click:Connect(function()
+    MainMenu.Visible = false
+    NftMenu.Visible = true
+end)
+
+TonBackBtn.MouseButton1Click:Connect(function()
+    TonMenu.Visible = false
+    MainMenu.Visible = true
+end)
+
+NftBackBtn.MouseButton1Click:Connect(function()
+    NftMenu.Visible = false
+    MainMenu.Visible = true
+end)
+
+-- Обновление баланса
+task.spawn(function()
+    while true do
+        local ton = Player:FindFirstChild("_TONValue")
+        local gems = Player:FindFirstChild("_GemsValue")
+        local stars = Player:FindFirstChild("_StarsValue")
+        local snow = Player:FindFirstChild("_SnowflakesValue")
+        
+        if TonBalance then
+            TonBalance.Text = "💎 " .. (ton and ton.Value or 0) .. "  💠 " .. (gems and gems.Value or 0)
+        end
+        if NftBalance then
+            NftBalance.Text = "⭐ " .. (stars and stars.Value or 0) .. "  💎 " .. (ton and ton.Value or 0) .. "  💠 " .. (gems and gems.Value or 0) .. "  ❄️ " .. (snow and snow.Value or 0)
+        end
+        task.wait(1)
+    end
+end)
+
+print("✅ ГЛАВНОЕ МЕНЮ ЗАГРУЖЕНО!")
+print("💎 TON BATTLE - валюта, NFT, батл, рулетка")
+print("🖼️ NFT BATTLE - ВСЕ ФУНКЦИИ (валюта, NFT, шоп, БП, скрыть, рулетка, батл, фьюз)")
