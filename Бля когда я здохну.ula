@@ -1,0 +1,472 @@
+--[[
+    TON BATTLE - NEON HUB v6.0
+    Фиолетовый неон • Только нужные функции • Для телефона
+    Автор: crutiial
+--]]
+
+local Player = game.Players.LocalPlayer
+local RS = game:GetService("ReplicatedStorage")
+local CoreGui = game:GetService("CoreGui")
+
+if CoreGui:FindFirstChild("NeonHub") then CoreGui.NeonHub:Destroy() end
+
+local Hub = Instance.new("ScreenGui")
+Hub.Name = "NeonHub"
+Hub.Parent = CoreGui
+Hub.IgnoreGuiInset = true
+
+-- ГЛАВНОЕ МЕНЮ
+local Main = Instance.new("Frame")
+Main.Size = UDim2.new(0, 330, 0, 480)
+Main.Position = UDim2.new(0.5, -165, 0.5, -240)
+Main.BackgroundColor3 = Color3.fromRGB(15, 10, 25)
+Main.BorderSizePixel = 0
+Main.Active = true
+Main.Draggable = true
+Main.Parent = Hub
+Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 14)
+
+-- НЕОНОВАЯ ОБВОДКА
+local Stroke = Instance.new("UIStroke")
+Stroke.Thickness = 1.5
+Stroke.Color = Color3.fromRGB(140, 80, 255)
+Stroke.Transparency = 0.3
+Stroke.Parent = Main
+
+-- ЗАГОЛОВОК
+local Header = Instance.new("Frame")
+Header.Size = UDim2.new(1, 0, 0, 70)
+Header.BackgroundColor3 = Color3.fromRGB(20, 12, 35)
+Header.Parent = Main
+Instance.new("UICorner", Header).CornerRadius = UDim.new(0, 14)
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 28)
+Title.Position = UDim2.new(0, 0, 0, 10)
+Title.BackgroundTransparency = 1
+Title.Text = "TON BATTLE NEON"
+Title.TextColor3 = Color3.fromRGB(180, 130, 255)
+Title.TextSize = 19
+Title.Font = Enum.Font.GothamBlack
+Title.Parent = Header
+
+local Subtitle = Instance.new("TextLabel")
+Subtitle.Size = UDim2.new(1, 0, 0, 18)
+Subtitle.Position = UDim2.new(0, 0, 0, 38)
+Subtitle.BackgroundTransparency = 1
+Subtitle.Text = "v6.0 • by crutiial"
+Subtitle.TextColor3 = Color3.fromRGB(120, 100, 160)
+Subtitle.TextSize = 10
+Subtitle.Font = Enum.Font.Gotham
+Subtitle.Parent = Header
+
+-- БАЛАНС
+local Balance = Instance.new("TextLabel")
+Balance.Size = UDim2.new(1, -20, 0, 24)
+Balance.Position = UDim2.new(0, 10, 0, 76)
+Balance.BackgroundColor3 = Color3.fromRGB(18, 12, 30)
+Balance.Text = "⭐ 0  💎 0  💠 0"
+Balance.TextColor3 = Color3.fromRGB(200, 180, 255)
+Balance.TextSize = 11
+Balance.Font = Enum.Font.Gotham
+Balance.Parent = Main
+Instance.new("UICorner", Balance).CornerRadius = UDim.new(0, 6)
+
+-- ЛЕВАЯ ПАНЕЛЬ
+local LeftPanel = Instance.new("ScrollingFrame")
+LeftPanel.Size = UDim2.new(0, 125, 1, -112)
+LeftPanel.Position = UDim2.new(0, 5, 0, 106)
+LeftPanel.BackgroundColor3 = Color3.fromRGB(15, 10, 25)
+LeftPanel.BorderSizePixel = 0
+LeftPanel.ScrollBarThickness = 2
+LeftPanel.ScrollBarImageColor3 = Color3.fromRGB(100, 60, 180)
+LeftPanel.CanvasSize = UDim2.new(0, 0, 0, 0)
+LeftPanel.Parent = Main
+
+-- ПРАВАЯ ПАНЕЛЬ
+local RightPanel = Instance.new("ScrollingFrame")
+RightPanel.Size = UDim2.new(0, 185, 1, -112)
+RightPanel.Position = UDim2.new(0, 135, 0, 106)
+RightPanel.BackgroundColor3 = Color3.fromRGB(18, 12, 30)
+RightPanel.BorderSizePixel = 0
+RightPanel.ScrollBarThickness = 2
+RightPanel.ScrollBarImageColor3 = Color3.fromRGB(100, 60, 180)
+RightPanel.CanvasSize = UDim2.new(0, 0, 0, 0)
+RightPanel.Parent = Main
+Instance.new("UICorner", RightPanel).CornerRadius = UDim.new(0, 8)
+
+-- ОЧИСТКА ПРАВОЙ ПАНЕЛИ
+local function ClearRight()
+    for _, obj in ipairs(RightPanel:GetChildren()) do
+        if obj:IsA("GuiObject") then obj:Destroy() end
+    end
+end
+
+-- КНОПКА НА ПРАВОЙ ПАНЕЛИ
+local function AddButton(text, color, callback)
+    local y = #RightPanel:GetChildren() * 36 + 5
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1, -10, 0, 32)
+    btn.Position = UDim2.new(0, 5, 0, y)
+    btn.BackgroundColor3 = color or Color3.fromRGB(30, 20, 50)
+    btn.Text = text
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.TextSize = 11
+    btn.Font = Enum.Font.GothamBold
+    btn.Parent = RightPanel
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
+    
+    -- Неоновая обводка кнопки
+    local stroke = Instance.new("UIStroke")
+    stroke.Thickness = 1
+    stroke.Color = Color3.fromRGB(160, 100, 255)
+    stroke.Transparency = 0.5
+    stroke.Parent = btn
+    
+    btn.MouseButton1Click:Connect(callback)
+    RightPanel.CanvasSize = UDim2.new(0, 0, 0, y + 40)
+    return btn
+end
+
+-- ПОЛЕ ВВОДА НА ПРАВОЙ ПАНЕЛИ
+local function AddInput(label, placeholder, btnText, callback)
+    local y = #RightPanel:GetChildren() * 36 + 5
+    
+    local lbl = Instance.new("TextLabel")
+    lbl.Size = UDim2.new(1, -10, 0, 16)
+    lbl.Position = UDim2.new(0, 5, 0, y)
+    lbl.BackgroundTransparency = 1
+    lbl.Text = label
+    lbl.TextColor3 = Color3.fromRGB(160, 140, 200)
+    lbl.TextSize = 10
+    lbl.Font = Enum.Font.Gotham
+    lbl.TextXAlignment = Enum.TextXAlignment.Left
+    lbl.Parent = RightPanel
+    
+    local input = Instance.new("TextBox")
+    input.Size = UDim2.new(1, -48, 0, 26)
+    input.Position = UDim2.new(0, 5, 0, y + 16)
+    input.BackgroundColor3 = Color3.fromRGB(22, 15, 35)
+    input.PlaceholderText = placeholder
+    input.Text = ""
+    input.TextColor3 = Color3.fromRGB(255, 255, 255)
+    input.TextSize = 10
+    input.Font = Enum.Font.Gotham
+    input.Parent = RightPanel
+    Instance.new("UICorner", input).CornerRadius = UDim.new(0, 4)
+    
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0, 38, 0, 26)
+    btn.Position = UDim2.new(1, -43, 0, y + 16)
+    btn.BackgroundColor3 = Color3.fromRGB(100, 60, 180)
+    btn.Text = btnText
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.TextSize = 10
+    btn.Font = Enum.Font.GothamBold
+    btn.Parent = RightPanel
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 4)
+    btn.MouseButton1Click:Connect(function() callback(input.Text) end)
+    
+    RightPanel.CanvasSize = UDim2.new(0, 0, 0, y + 55)
+    return input
+end
+
+-- ФУНКЦИИ МЕНЮ
+local Functions = {
+    {
+        Name = "📦 Авто-кейсы",
+        Color = Color3.fromRGB(100, 50, 180),
+        Content = function()
+            local caseInput = AddInput("Кейс:", "Radioactive", "✓", function(val) _G.FarmCase = val end)
+            caseInput.Text = _G.FarmCase or "Radioactive"
+            
+            local amtInput = AddInput("За раз:", "1-10", "✓", function(val) _G.FarmAmt = tonumber(val) or 1 end)
+            amtInput.Text = tostring(_G.FarmAmt or 1)
+            
+            local farmBtn = AddButton("▶ ЗАПУСТИТЬ ФАРМ", Color3.fromRGB(80, 40, 160), function()
+                if _G.FarmRun then
+                    _G.FarmRun = false
+                    farmBtn.Text = "▶ ЗАПУСТИТЬ ФАРМ"
+                    farmBtn.BackgroundColor3 = Color3.fromRGB(80, 40, 160)
+                    return
+                end
+                _G.FarmRun = true
+                farmBtn.Text = "⏹ ОСТАНОВИТЬ"
+                farmBtn.BackgroundColor3 = Color3.fromRGB(160, 40, 40)
+                task.spawn(function()
+                    while _G.FarmRun do
+                        pcall(function()
+                            RS.Events.OpenCase:InvokeServer(_G.FarmCase or "Radioactive", _G.FarmAmt or 1)
+                        end)
+                        task.wait(0.1)
+                    end
+                end)
+            end)
+            
+            AddButton("🔄 Авто-продажа (ВКЛ/ВЫКЛ)", Color3.fromRGB(120, 80, 40), function()
+                local pass = Player:FindFirstChild("_1701171906") or Instance.new("NumberValue", Player)
+                pass.Name = "_1701171906"
+                pass.Value = pass.Value == 1 and 0 or 1
+            end)
+        end
+    },
+    {
+        Name = "⚔️ Батл",
+        Color = Color3.fromRGB(180, 80, 40),
+        Content = function()
+            AddInput("Кейс:", "Radioactive", "✓", function(val) _G.BatCase = val end).Text = _G.BatCase or "Radioactive"
+            AddInput("За раз:", "1-10", "✓", function(val) _G.BatAmt = tonumber(val) or 1 end).Text = tostring(_G.BatAmt or 1)
+            
+            AddButton("⚔️ Батл с ботом", Color3.fromRGB(160, 60, 20), function()
+                local cases = {}
+                for i = 1, (_G.BatAmt or 1) do table.insert(cases, _G.BatCase or "Radioactive") end
+                RS.Events.Battles:InvokeServer("Create", cases, {})
+                task.wait(0.5)
+                RS.Events.Battles:InvokeServer("CallABot")
+            end)
+            
+            local autoBatBtn = AddButton("🔄 Авто-батл", Color3.fromRGB(140, 100, 40), function()
+                if _G.AutoBatRun then
+                    _G.AutoBatRun = false
+                    autoBatBtn.Text = "🔄 Авто-батл"
+                    return
+                end
+                _G.AutoBatRun = true
+                autoBatBtn.Text = "⏹ СТОП"
+                task.spawn(function()
+                    while _G.AutoBatRun do
+                        pcall(function()
+                            local cases = {}
+                            for i = 1, (_G.BatAmt or 1) do table.insert(cases, _G.BatCase or "Radioactive") end
+                            RS.Events.Battles:InvokeServer("Create", cases, {})
+                            task.wait(0.5)
+                            RS.Events.Battles:InvokeServer("CallABot")
+                        end)
+                        task.wait(3)
+                    end
+                end)
+            end)
+        end
+    },
+    {
+        Name = "🍀 Удача",
+        Color = Color3.fromRGB(40, 140, 40),
+        Content = function()
+            AddButton("x2 Удача", Color3.fromRGB(40, 120, 40), function()
+                local v = RS:FindFirstChild("LuckValue") if v then v.Value = 99999 end
+            end)
+            AddButton("x4 Удача", Color3.fromRGB(40, 120, 40), function()
+                local v = RS:FindFirstChild("LuckValue2") if v then v.Value = 99999 end
+            end)
+            AddButton("x6 Удача", Color3.fromRGB(40, 120, 40), function()
+                local v = RS:FindFirstChild("LuckValue3") if v then v.Value = 99999 end
+            end)
+            AddButton("🛡️ Cross", Color3.fromRGB(60, 100, 180), function()
+                local v = RS:FindFirstChild("CrossValue") if v then v.Value = 99999 end
+            end)
+            AddButton("💗 Pink Galaxy", Color3.fromRGB(160, 60, 160), function()
+                local v = RS:FindFirstChild("LuckPinkGalaxy") if v then v.Value = 99999 end
+            end)
+            AddButton("🔥 ВСЁ СРАЗУ", Color3.fromRGB(180, 80, 30), function()
+                for _, name in ipairs({"LuckValue", "LuckValue2", "LuckValue3", "CrossValue", "LuckPinkGalaxy"}) do
+                    local v = RS:FindFirstChild(name) if v then v.Value = 99999 end
+                end
+                for _, name in ipairs({"_LuckyPotion", "_LuckyPotion2", "_LuckyPotion3"}) do
+                    local v = Player:FindFirstChild(name) if v then v.Value = 99999 end
+                end
+            end)
+        end
+    },
+    {
+        Name = "⚡ Буст",
+        Color = Color3.fromRGB(180, 140, 40),
+        Content = function()
+            AddButton("Fast Upgrade", Color3.fromRGB(160, 120, 30), function()
+                local pass = Player:FindFirstChild("_1669383652") or Instance.new("NumberValue", Player)
+                pass.Name = "_1669383652" pass.Value = 1
+            end)
+            AddButton("Auto Open", Color3.fromRGB(50, 90, 180), function()
+                local pass = Player:FindFirstChild("_1701171906") or Instance.new("NumberValue", Player)
+                pass.Name = "_1701171906" pass.Value = 1
+            end)
+            AddButton("Premium BP", Color3.fromRGB(160, 60, 160), function()
+                local pass = Player:FindFirstChild("_1793437867") or Instance.new("NumberValue", Player)
+                pass.Name = "_1793437867" pass.Value = 1
+                local prem = Player:FindFirstChild("_BPPremium") if prem then prem.Value = 1 end
+            end)
+        end
+    },
+    {
+        Name = "👑 БП",
+        Color = Color3.fromRGB(140, 80, 200),
+        Content = function()
+            AddInput("Уровень:", "1-50", "✓", function(val)
+                local v = tonumber(val)
+                if v and Player._BPLevel then Player._BPLevel.Value = math.clamp(v, 1, 50) end
+            end).Text = tostring(Player._BPLevel and Player._BPLevel.Value or 25)
+            
+            AddButton("Сброс наград", Color3.fromRGB(180, 80, 40), function()
+                local claimed = Player:FindFirstChild("_BPClaimed")
+                if claimed then for _, v in ipairs(claimed:GetChildren()) do if v:IsA("BoolValue") then v.Value = false end end end
+            end)
+            AddButton("Skip x1", Color3.fromRGB(100, 50, 180), function() RS.Events.SkipLevel:FireServer() end)
+            AddButton("Skip x50", Color3.fromRGB(120, 40, 180), function()
+                for i = 1, 50 do RS.Events.SkipLevel:FireServer() task.wait(0.05) end
+            end)
+        end
+    },
+    {
+        Name = "💰 Вал",
+        Color = Color3.fromRGB(200, 180, 40),
+        Content = function()
+            for _, curr in ipairs({"_StarsValue", "_TONValue", "_GemsValue"}) do
+                local label = curr == "_StarsValue" and "⭐ Stars" or curr == "_TONValue" and "💎 TON" or "💠 Gems"
+                AddInput(label, "0", "✓", function(val)
+                    local v = tonumber(val) if v then Player[curr].Value = v end
+                end).Text = tostring(Player[curr].Value)
+            end
+        end
+    },
+    {
+        Name = "🖼️ NFT",
+        Color = Color3.fromRGB(100, 140, 200),
+        Content = function()
+            AddInput("BestDrop:", "Название", "✓", function(val)
+                if Player._BestDrop then Player._BestDrop.Value = val end
+            end).Text = Player._BestDrop and Player._BestDrop.Value or ""
+            
+            AddInput("Добавить:", "Название NFT", "+", function(val)
+                local inv = Player._Inventory
+                if inv and val ~= "" then
+                    Instance.new("StringValue", inv).Name = val
+                end
+            end)
+            
+            AddButton("📚 Заполнить Индекс", Color3.fromRGB(160, 80, 40), function()
+                local idx = Player._Index
+                if idx then for _, item in ipairs(idx:GetChildren()) do item.Value = 999999 end end
+            end)
+            AddButton("🗑️ Продать всё", Color3.fromRGB(180, 40, 40), function()
+                for i = 1, 30 do task.spawn(function() RS.Events.Inventory:FireServer("Sell", "ALL", false) end) end
+            end)
+            AddButton("💰 В TON", Color3.fromRGB(200, 120, 40), function()
+                local inv = Player._Inventory
+                local items = {}
+                for _, item in ipairs(inv:GetChildren()) do
+                    if item:GetAttribute("Unique") then table.insert(items, item) end
+                end
+                if #items > 0 then RS.Events.TON:InvokeServer("SellAll", items) end
+            end)
+            AddButton("👻 Скрыть все", Color3.fromRGB(100, 80, 140), function()
+                local inv = Player._Inventory
+                if inv then for _, item in ipairs(inv:GetChildren()) do item:SetAttribute("Hidden", true) end end
+            end)
+            AddButton("👁️ Показать все", Color3.fromRGB(80, 140, 100), function()
+                local inv = Player._Inventory
+                if inv then for _, item in ipairs(inv:GetChildren()) do item:SetAttribute("Hidden", nil) end end
+            end)
+        end
+    },
+    {
+        Name = "⚙️ Ещё",
+        Color = Color3.fromRGB(140, 140, 200),
+        Content = function()
+            AddButton("🔥 Фьюз Debug", Color3.fromRGB(180, 80, 140), function()
+                local inv = Player._Inventory
+                local items = {}
+                for _, item in ipairs(inv:GetChildren()) do
+                    if #items < 5 and not item:GetAttribute("Unique") then table.insert(items, item) end
+                end
+                if #items == 5 then RS.Events.Fuse:InvokeServer("Fuse", items, true) end
+            end)
+            AddButton("🎰 Рулетка", Color3.fromRGB(180, 40, 40), function()
+                local pgui = Player:WaitForChild("PlayerGui")
+                local mgui = pgui:FindFirstChild("MainGui")
+                if mgui then
+                    local pages = mgui:FindFirstChild("Pages")
+                    if pages then
+                        local fuse = pages:FindFirstChild("Fuse")
+                        if fuse then fuse.Visible = true end
+                        mgui.Visible = true
+                    end
+                end
+            end)
+            AddButton("📅 Сброс Daily", Color3.fromRGB(80, 160, 120), function()
+                local daily = Player:FindFirstChild("_Daily")
+                if daily then daily.Value = os.time() - 999999 end
+                RS.Events.OpenCase:InvokeServer("Daily", 1)
+            end)
+            AddButton("📋 Клейм заданий", Color3.fromRGB(120, 120, 180), function()
+                local tasks = Player:FindFirstChild("_Tasks")
+                if tasks then
+                    for _, task in ipairs(tasks:GetChildren()) do
+                        pcall(function() RS.Events.Tasks:InvokeServer("Claim", task) end)
+                        task.wait(0.1)
+                    end
+                end
+            end)
+            AddButton("🎨 Все темы", Color3.fromRGB(100, 120, 180), function()
+                for i = 0, 5 do RS.Events.Theme:FireServer(i) task.wait(0.05) end
+            end)
+            AddButton("🏷️ Брут промо", Color3.fromRGB(120, 160, 80), function()
+                local codes = {"TONBATTLE", "DIVINE", "FREETON", "TON500", "GEM100", "HOLYGRENADE"}
+                for _, c in ipairs(codes) do pcall(function() RS.Events.Code:InvokeServer(c) end) task.wait(0.3) end
+            end)
+            AddButton("📊 Статистика MAX", Color3.fromRGB(80, 120, 140), function()
+                if Player._CasesOpened then Player._CasesOpened.Value = 999999 end
+                if Player._UpgradesMade then Player._UpgradesMade.Value = 999999 end
+            end)
+        end
+    }
+}
+
+-- ЗАПОЛНЕНИЕ ЛЕВОЙ ПАНЕЛИ
+local LY = 5
+for _, func in ipairs(Functions) do
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1, -10, 0, 36)
+    btn.Position = UDim2.new(0, 5, 0, LY)
+    btn.BackgroundColor3 = func.Color or Color3.fromRGB(30, 20, 50)
+    btn.Text = func.Name
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.TextSize = 12
+    btn.Font = Enum.Font.GothamBold
+    btn.Parent = LeftPanel
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
+    
+    -- Обводка
+    local stroke = Instance.new("UIStroke")
+    stroke.Thickness = 1
+    stroke.Color = Color3.fromRGB(160, 100, 255)
+    stroke.Transparency = 0.4
+    stroke.Parent = btn
+    
+    btn.MouseButton1Click:Connect(function()
+        -- Подсветка выбранной кнопки
+        for _, b in ipairs(LeftPanel:GetChildren()) do
+            if b:IsA("TextButton") then b.BackgroundColor3 = b == btn and func.Color or Color3.fromRGB(30, 20, 50) end
+        end
+        ClearRight()
+        func.Content()
+    end)
+    
+    LY = LY + 42
+end
+
+LeftPanel.CanvasSize = UDim2.new(0, 0, 0, LY + 10)
+
+-- Авто-загрузка первой функции
+Functions[1].Content()
+
+-- Обновление баланса
+task.spawn(function()
+    while true do
+        local s = Player._StarsValue and Player._StarsValue.Value or 0
+        local t = Player._TONValue and Player._TONValue.Value or 0
+        local g = Player._GemsValue and Player._GemsValue.Value or 0
+        Balance.Text = "⭐ " .. s .. "  💎 " .. t .. "  💠 " .. g
+        task.wait(1)
+    end
+end)
+
+print("✅ NEON HUB v6.0 • by crutiial")
