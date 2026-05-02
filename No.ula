@@ -1,0 +1,134 @@
+-- NFT Battle v6.5 Full
+local Player=game.Players.LocalPlayer
+local RS=game:GetService("ReplicatedStorage")
+local Events=RS.Events
+local PG=Player.PlayerGui
+local UIS=game:GetService("UserInputService")
+
+local Theme=Color3.fromRGB(30,100,255)
+local TColors={Color3.fromRGB(30,100,255),Color3.fromRGB(30,255,100),Color3.fromRGB(255,150,30),Color3.fromRGB(150,30,255)}
+local Cases={"Daily","Trash","Beggar","Plodder","Office Clerk","Director","Oligarch","Manager","Frozen Heart","Bubble Gum","Cats","Dream","Glitch","Bloody Night","Ninja Turtles","Gold","Dark","Palm","Burj","Luxury","Monarch","Angel","M5 F90","G63","Porsche 911","URUS","Durov","Magnate","Cirque","REDO","Desk Calendars","Heavenfall","Abyss Core","Radioactive","Cursed Demon","Marina","Divine","Photon Core","Sunny day"}
+local SelCases,AutoOpen,Count,AutoSell={},false,1,false
+local BattleCases,BattleOn,BattleCount={},false,1
+
+local G=Instance.new("ScreenGui",PG);G.Name="N6"
+local M=Instance.new("Frame",G);M.Size=UDim2.new(0,180,0,260);M.Position=UDim2.new(0,50,0,100);M.BackgroundColor3=Color3.fromRGB(18,18,18);M.BorderSizePixel=0;M.ClipsDescendants=true
+Instance.new("UICorner",M).CornerRadius=UDim.new(0,8)
+
+local drag,ds,sp=false,nil,nil
+local T=Instance.new("Frame",M);T.Size=UDim2.new(1,0,0,24);T.BackgroundColor3=Theme;T.BorderSizePixel=0
+Instance.new("UICorner",T).CornerRadius=UDim.new(0,8)
+local TL=Instance.new("TextLabel",T);TL.Text="NFT Battle v6";TL.Size=UDim2.new(1,-60,1,0);TL.Position=UDim2.new(0,8,0,0);TL.TextColor3=Color3.new(1,1,1);TL.Font=Enum.Font.GothamBold;TL.TextSize=10;TL.BackgroundTransparency=1;TL.TextXAlignment=Enum.TextXAlignment.Left
+local CB=Instance.new("TextButton",T);CB.Text="×";CB.Size=UDim2.new(0,20,1,0);CB.Position=UDim2.new(1,-20,0,0);CB.TextColor3=Color3.new(1,1,1);CB.Font=Enum.Font.GothamBold;CB.TextSize=14;CB.BackgroundTransparency=1;CB.MouseButton1Click:Connect(function()G:Destroy()end)
+local MB=Instance.new("TextButton",T);MB.Text="−";MB.Size=UDim2.new(0,20,1,0);MB.Position=UDim2.new(1,-40,0,0);MB.TextColor3=Color3.new(1,1,1);MB.Font=Enum.Font.GothamBold;MB.TextSize=14;MB.BackgroundTransparency=1
+local min,OS=false,M.Size
+MB.MouseButton1Click:Connect(function()min=not min;M.Size=min and UDim2.new(0,180,0,24)or OS;for _,v in ipairs(M:GetChildren())do if v~=T then v.Visible=not min end end end)
+
+T.InputBegan:Connect(function(i)if i.UserInputType==Enum.UserInputType.Touch or i.UserInputType==Enum.UserInputType.MouseButton1 then drag=true;ds=i.Position;sp=M.Position end end)
+UIS.InputChanged:Connect(function(i)if drag and i.UserInputType==Enum.UserInputType.Touch then local d=i.Position-ds;M.Position=UDim2.new(sp.X.Scale,sp.X.Offset+d.X,sp.Y.Scale,sp.Y.Offset+d.Y)end end)
+UIS.InputEnded:Connect(function(i)if i.UserInputType==Enum.UserInputType.Touch or i.UserInputType==Enum.UserInputType.MouseButton1 then drag=false end end)
+
+local TF=Instance.new("Frame",M);TF.Size=UDim2.new(0,22,1,-24);TF.Position=UDim2.new(0,0,0,24);TF.BackgroundColor3=Color3.fromRGB(22,22,22);TF.BorderSizePixel=0
+local PG2=Instance.new("Frame",M);PG2.Size=UDim2.new(1,-22,1,-24);PG2.Position=UDim2.new(0,22,0,24);PG2.BackgroundColor3=Color3.fromRGB(25,25,25);PG2.BorderSizePixel=0
+local TB={"📦","⚔️","🔧","🎄","⚙️"}
+local TP={}
+for i,ic in ipairs(TB)do
+ local b=Instance.new("TextButton",TF);b.Text=ic;b.Size=UDim2.new(1,0,0,28);b.Position=UDim2.new(0,0,0,(i-1)*28);b.BackgroundColor3=i==1 and Theme or Color3.fromRGB(30,30,30);b.TextColor3=Color3.new(1,1,1);b.Font=Enum.Font.Gotham;b.TextSize=10;b.BorderSizePixel=0
+ local p=Instance.new("ScrollingFrame",PG2);p.Size=UDim2.new(1,-4,1,-4);p.Position=UDim2.new(0,2,0,2);p.BackgroundTransparency=1;p.Visible=i==1;p.CanvasSize=UDim2.new(0,0,0,0);p.ScrollBarThickness=2;TP[i]=p
+ b.MouseButton1Click:Connect(function()for j,pp in ipairs(TP)do pp.Visible=j==i end;for _,bb in ipairs(TF:GetChildren())do if bb:IsA("TextButton")then bb.BackgroundColor3=Color3.fromRGB(30,30,30)end end;b.BackgroundColor3=Theme end)
+end
+
+local P1,P2,P3,P4,P5=TP[1],TP[2],TP[3],TP[4],TP[5]
+local y=0
+for i,n in ipairs(Cases)do
+ local r=Instance.new("Frame",P1);r.Size=UDim2.new(1,-2,0,16);r.Position=UDim2.new(0,1,0,y);r.BackgroundColor3=Color3.fromRGB(35,35,35)
+ local c=Instance.new("TextButton",r);c.Text=n;c.Size=UDim2.new(1,0,1,0);c.TextColor3=Color3.new(1,1,1);c.Font=Enum.Font.Gotham;c.TextSize=7;c.BackgroundTransparency=1;c.TextXAlignment=Enum.TextXAlignment.Left
+ c.MouseButton1Click:Connect(function()SelCases[n]=not SelCases[n];r.BackgroundColor3=SelCases[n]and Theme or Color3.fromRGB(35,35,35)end)
+ y=y+17
+end
+P1.CanvasSize=UDim2.new(0,0,0,y+100)
+
+local cf=Instance.new("Frame",P1);cf.Size=UDim2.new(1,0,0,18);cf.Position=UDim2.new(0,0,0,y);cf.BackgroundColor3=Color3.fromRGB(30,30,30)
+local ci=Instance.new("TextBox",cf);ci.Text="1";ci.Size=UDim2.new(0,25,1,-2);ci.Position=UDim2.new(0,2,0,1);ci.BackgroundColor3=Color3.fromRGB(50,50,50);ci.TextColor3=Color3.new(1,1,1);ci.Font=Enum.Font.Gotham;ci.TextSize=8;ci.FocusLost:Connect(function()Count=tonumber(ci.Text)or 1;ci.Text=tostring(Count)end)
+local cl=Instance.new("TextLabel",cf);cl.Text="шт/раз";cl.Size=UDim2.new(1,-30,1,0);cl.Position=UDim2.new(0,28,0,0);cl.TextColor3=Color3.new(.7,.7,.7);cl.Font=Enum.Font.Gotham;cl.TextSize=7;cl.BackgroundTransparency=1;cl.TextXAlignment=Enum.TextXAlignment.Left
+y=y+20
+
+local as=Instance.new("TextButton",P1);as.Text="Авто продажа: ВЫКЛ";as.Size=UDim2.new(1,0,0,16);as.Position=UDim2.new(0,0,0,y);as.BackgroundColor3=Color3.fromRGB(50,50,50);as.TextColor3=Color3.new(1,1,1);as.Font=Enum.Font.Gotham;as.TextSize=7
+as.MouseButton1Click:Connect(function()AutoSell=not AutoSell;as.Text="Авто продажа: "..(AutoSell and"ВКЛ"or"ВЫКЛ");as.BackgroundColor3=AutoSell and Color3.fromRGB(0,150,0)or Color3.fromRGB(50,50,50)end)
+y=y+18
+
+local ff=Instance.new("Frame",P1);ff.Size=UDim2.new(1,0,0,16);ff.Position=UDim2.new(0,0,0,y);ff.BackgroundColor3=Color3.fromRGB(30,30,30)
+local fi=Instance.new("TextBox",ff);fi.PlaceholderText="Сохранить NFT...";fi.Size=UDim2.new(.7,0,1,0);fi.BackgroundColor3=Color3.fromRGB(50,50,50);fi.TextColor3=Color3.new(1,1,1);fi.Font=Enum.Font.Gotham;fi.TextSize=6
+local fb=Instance.new("TextButton",ff);fb.Text="⭐";fb.Size=UDim2.new(.3,0,1,0);fb.Position=UDim2.new(.7,0,0,0);fb.BackgroundColor3=Theme;fb.TextColor3=Color3.new(1,1,1);fb.Font=Enum.Font.GothamBold;fb.TextSize=8
+fb.MouseButton1Click:Connect(function()if fi.Text~=""then local name=fi.Text;fi.Text=""end end)
+y=y+18
+
+local sb=Instance.new("TextButton",P1);sb.Text="▶ СТАРТ";sb.Size=UDim2.new(1,0,0,22);sb.Position=UDim2.new(0,0,0,y);sb.BackgroundColor3=Color3.fromRGB(0,180,0);sb.TextColor3=Color3.new(1,1,1);sb.Font=Enum.Font.GothamBold;sb.TextSize=9
+sb.MouseButton1Click:Connect(function()
+ AutoOpen=not AutoOpen;sb.Text=AutoOpen and"■ СТОП"or"▶ СТАРТ";sb.BackgroundColor3=AutoOpen and Color3.fromRGB(255,30,30)or Color3.fromRGB(0,180,0)
+ if AutoOpen then task.spawn(function()while AutoOpen do for cn,_ in pairs(SelCases)do if not AutoOpen then break end;pcall(function()Events.OpenCase:InvokeServer(cn,Count)end);if AutoSell then Events.Inventory:FireServer("Sell","ALL",false)end;task.wait(.15)end end end)end
+end)
+y=y+24;P1.CanvasSize=UDim2.new(0,0,0,y)
+
+local y2=0
+for i,n in ipairs(Cases)do
+ local r=Instance.new("Frame",P2);r.Size=UDim2.new(1,-2,0,16);r.Position=UDim2.new(0,1,0,y2);r.BackgroundColor3=Color3.fromRGB(35,35,35)
+ local c=Instance.new("TextButton",r);c.Text=n;c.Size=UDim2.new(1,0,1,0);c.TextColor3=Color3.new(1,1,1);c.Font=Enum.Font.Gotham;c.TextSize=7;c.BackgroundTransparency=1;c.TextXAlignment=Enum.TextXAlignment.Left
+ c.MouseButton1Click:Connect(function()local t=0;for _,_ in pairs(BattleCases)do t=t+1 end;if BattleCases[n]then BattleCases[n]=nil;r.BackgroundColor3=Color3.fromRGB(35,35,35)elseif t<10 then BattleCases[n]=true;r.BackgroundColor3=Theme end end)
+ y2=y2+17
+end
+P2.CanvasSize=UDim2.new(0,0,0,y2+80)
+local bf=Instance.new("Frame",P2);bf.Size=UDim2.new(1,0,0,18);bf.Position=UDim2.new(0,0,0,y2);bf.BackgroundColor3=Color3.fromRGB(30,30,30)
+local bi=Instance.new("TextBox",bf);bi.Text="1";bi.Size=UDim2.new(0,25,1,-2);bi.Position=UDim2.new(0,2,0,1);bi.BackgroundColor3=Color3.fromRGB(50,50,50);bi.TextColor3=Color3.new(1,1,1);bi.Font=Enum.Font.Gotham;bi.TextSize=8;bi.FocusLost:Connect(function()BattleCount=tonumber(bi.Text)or 1;bi.Text=tostring(BattleCount)end)
+y2=y2+22
+local bb=Instance.new("TextButton",P2);bb.Text="▶ АВТО БАТЛЫ";bb.Size=UDim2.new(1,0,0,22);bb.Position=UDim2.new(0,0,0,y2);bb.BackgroundColor3=Color3.fromRGB(255,120,0);bb.TextColor3=Color3.new(1,1,1);bb.Font=Enum.Font.GothamBold;bb.TextSize=9
+bb.MouseButton1Click:Connect(function()
+ BattleOn=not BattleOn;bb.Text=BattleOn and"■ СТОП"or"▶ АВТО БАТЛЫ";bb.BackgroundColor3=BattleOn and Color3.fromRGB(255,30,30)or Color3.fromRGB(255,120,0)
+ if BattleOn then task.spawn(function()while BattleOn do local bc={};for cn,_ in pairs(BattleCases)do for i=1,BattleCount do table.insert(bc,cn);if #bc>=10 then break end end;if #bc>=10 then break end end;if #bc>0 then pcall(function()Events.Battles:InvokeServer("Create",bc,{})end)end;task.wait(30)end end)end
+end)
+
+local ly=0
+local function AB(tx,cb)local b=Instance.new("TextButton",P3);b.Text=tx;b.Size=UDim2.new(1,0,0,18);b.Position=UDim2.new(0,0,0,ly);b.BackgroundColor3=Theme;b.TextColor3=Color3.new(1,1,1);b.Font=Enum.Font.Gotham;b.TextSize=7;b.MouseButton1Click:Connect(cb);ly=ly+19 end
+local function AI(tx,cb)local f=Instance.new("Frame",P3);f.Size=UDim2.new(1,0,0,18);f.Position=UDim2.new(0,0,0,ly);f.BackgroundColor3=Color3.fromRGB(35,35,35)
+local i=Instance.new("TextBox",f);i.PlaceholderText=tx;i.Size=UDim2.new(.7,0,1,0);i.BackgroundColor3=Color3.fromRGB(50,50,50);i.TextColor3=Color3.new(1,1,1);i.Font=Enum.Font.Gotham;i.TextSize=7
+local o=Instance.new("TextButton",f);o.Text="OK";o.Size=UDim2.new(.3,0,1,0);o.Position=UDim2.new(.7,0,0,0);o.BackgroundColor3=Theme;o.TextColor3=Color3.new(1,1,1);o.Font=Enum.Font.GothamBold;o.TextSize=7;o.MouseButton1Click:Connect(function()cb(i.Text)i.Text=""end);ly=ly+19 end
+AB("💰 Вся валюта",function()for _,n in ipairs({"_StarsValue","_TONValue","_GemsValue","_SnowflakesValue"})do local v=Player:FindFirstChild(n);if v then v.Value=999999999 end end end)
+AB("⚡ Fast Upgrade",function()local p=Player:FindFirstChild("_1628441770")or Instance.new("NumberValue",Player);p.Name="_1628441770";p.Value=1 end)
+AB("📊 Заполнить индекс",function()local idx=Player:FindFirstChild("_Index");if idx then for _,v in ipairs(idx:GetChildren())do if v:IsA("IntValue")then v.Value=999999 end end end end)
+AI("NFT в инвентарь",function(t)Instance.new("StringValue",Player._Inventory).Name=t end)
+AI("Лучший дроп",function(t)local d=Player:FindFirstChild("_BestDrop");if d then d.Value=t end end)
+AI("NFT в индекс (имя,кол)",function(t)local parts=t:split(",");local idx=Player:FindFirstChild("_Index");if idx then local v=idx:FindFirstChild(parts[1]);if not v then v=Instance.new("IntValue",idx);v.Name=parts[1]end;v.Value=v.Value+(tonumber(parts[2])or 1)end end)
+AB("🍀 Удача x2 10мин",function()local l=RS:FindFirstChild("LuckValue");if l then l.Value=600 end;local lp=Player:FindFirstChild("_LuckyPotion");if lp then lp.Value=600 end end)
+AB("🍀 Удача x4 10мин",function()local l=RS:FindFirstChild("LuckValue2");if l then l.Value=600 end;local lp=Player:FindFirstChild("_LuckyPotion2");if lp then lp.Value=600 end end)
+AB("✝️ Благословение 5мин",function()local c=RS:FindFirstChild("CrossValue");if c then c.Value=300 end end)
+P3.CanvasSize=UDim2.new(0,0,0,ly+10)
+
+local ny=0
+local ngBtn=Instance.new("TextButton",P4);ngBtn.Text="🎡 ЗАПУСТИТЬ НГ КОЛЕСО";ngBtn.Size=UDim2.new(1,0,0,25);ngBtn.Position=UDim2.new(0,0,0,ny);ngBtn.BackgroundColor3=Color3.fromRGB(255,40,40);ngBtn.TextColor3=Color3.new(1,1,1);ngBtn.Font=Enum.Font.GothamBold;ngBtn.TextSize=9
+ngBtn.MouseButton1Click:Connect(function()
+ local s=Player:FindFirstChild("_SnowflakesValue");if s then s.Value=99999 end
+ local cs=Player:FindFirstChild("_ChristmasSpins");if cs then cs.Value=999 end
+ task.spawn(function()for i=1,100 do pcall(function()Events.Spin:InvokeServer("Spin")end);task.wait(.5)end end)
+end)
+ny=ny+30
+for _,cn in ipairs({"Festive","Santa","Reindeer","XMAS Night"})do
+ local b=Instance.new("TextButton",P4);b.Text="🎁 "..cn;b.Size=UDim2.new(1,0,0,22);b.Position=UDim2.new(0,0,0,ny);b.BackgroundColor3=Color3.fromRGB(150,30,30);b.TextColor3=Color3.new(1,1,1);b.Font=Enum.Font.Gotham;b.TextSize=8
+ b.MouseButton1Click:Connect(function()Events.GUI:Fire("CasePage",cn)end)
+ ny=ny+24
+end
+P4.CanvasSize=UDim2.new(0,0,0,ny+20)
+
+local sy=0
+local av=Instance.new("ImageLabel",P5);av.Size=UDim2.new(0,40,0,40);av.Position=UDim2.new(0,5,0,5);av.Image="https://www.roblox.com/headshot-thumbnail/image?userId=9988144824&width=150&height=150&format=png";av.BackgroundColor3=Color3.fromRGB(40,40,40);Instance.new("UICorner",av).CornerRadius=UDim.new(1,0)
+local cl2=Instance.new("TextLabel",P5);cl2.Text="TROTULOV39";cl2.Size=UDim2.new(1,-50,0,18);cl2.Position=UDim2.new(0,50,0,8);cl2.TextColor3=Color3.new(1,1,1);cl2.Font=Enum.Font.GothamBold;cl2.TextSize=9;cl2.BackgroundTransparency=1;cl2.TextXAlignment=Enum.TextXAlignment.Left
+local vl2=Instance.new("TextLabel",P5);vl2.Text="v6.5";vl2.Size=UDim2.new(1,-50,0,14);vl2.Position=UDim2.new(0,50,0,26);vl2.TextColor3=Color3.new(.6,.6,.6);vl2.Font=Enum.Font.Gotham;vl2.TextSize=7;vl2.BackgroundTransparency=1;vl2.TextXAlignment=Enum.TextXAlignment.Left
+sy=50
+for _,clr in ipairs(TColors)do
+ local b=Instance.new("TextButton",P5);b.Size=UDim2.new(1,0,0,18);b.Position=UDim2.new(0,0,0,sy);b.BackgroundColor3=clr;b.Text=""
+ b.MouseButton1Click:Connect(function()Theme=clr;T.BackgroundColor3=Theme end)
+ sy=sy+20
+end
+P5.CanvasSize=UDim2.new(0,0,0,sy+10)
+
+OS=M.Size
+print("✅ NFT Battle v6.5 загружен!")
