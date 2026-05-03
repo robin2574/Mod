@@ -1,0 +1,96 @@
+-- Cypher Right v1.0
+local p,u,i,m,b,b2,b3,b4={},game:GetService("ReplicatedStorage"),game.Players.LocalPlayer,Instance.new
+local ev,gui,tw,uis,inv,inf,rs=u.Events,m("ScreenGui",i.PlayerGui),game:GetService("TweenService"),game:GetService("UserInputService"),i._Inventory,require(u.Info),u.Events
+gui.Name="CypherRight"
+local col={Orange=Color3.fromRGB(255,136,0),Purple=Color3.fromRGB(147,0,255),Rasp=Color3.fromRGB(255,0,85),Green=Color3.fromRGB(0,255,34),Mint=Color3.fromRGB(0,255,170),Red=Color3.fromRGB(255,0,0),Black=Color3.fromRGB(20,20,20),Yell=Color3.fromRGB(255,230,0)}
+local sc=col.Purple
+local function cr(n,p,s,b,c,t,x)local o=m(n,p)for k,v in{s=s,b=b,c=c,t=t,x=x}do if v then o[k]=v end end return o end
+local function btn(p,t,cb)local b=cr("TextButton",p,{Size=UDim2.new(1,-4,0,18),Position=UDim2.new(0,2,0,2),Text=t,BackgroundColor3=Color3.fromRGB(40,40,40),TextColor3=Color3.new(1,1,1),BorderSizePixel=0,Font=Enum.Font.Gotham,TextSize=11})b:GetPropertyChangedSignal("Parent"):Connect(function()end)return b end
+local function tb(p,t,cb)local b=btn(p,t,cb)b.BackgroundColor3=Color3.fromRGB(55,55,55)b.Size=UDim2.new(1,-4,0,20)b.TextSize=12 return b end
+local function ck(n)local f=m("Frame",nil,{Size=UDim2.new(1,-4,0,18),Position=UDim2.new(0,2,0,2),BackgroundColor3=Color3.fromRGB(50,50,50),BorderSizePixel=0})local l=m("TextLabel",f,{Size=UDim2.new(1,-20,1,0),Position=UDim2.new(0,4,0,0),Text=n,TextColor3=Color3.new(1,1,1),BackgroundTransparency=1,Font=Enum.Font.Gotham,TextSize=10,TextXAlignment=Enum.TextXAlignment.Left})local t=m("TextButton",f,{Size=UDim2.new(0,18,0,18),Position=UDim2.new(1,-18,0,0),Text="✓",TextColor3=Color3.new(0,1,0),BackgroundColor3=Color3.fromRGB(40,40,40),BorderSizePixel=0,Font=Enum.Font.GothamBold,TextSize=12})return f,t end
+local sTab="Cases"
+local cases={}for n,v in inf.Cases do if not v.Limited and not v.Paid and not v.TON and not v.GEMS then table.insert(cases,n)end end
+local ngCases={"Reindeer","Santa","XMAS Night","Festive"}
+local pCases={}for n,v in inf.Cases do if v.Paid then table.insert(pCases,n)end end
+local autoSell=false
+local autoFuse=false
+local favList={}
+local battleCases={}
+local selCase=""
+local running=false
+local antiAfk=true
+local min=false
+
+-- Main Frame
+local M=cr("Frame",gui,{Size=UDim2.new(0,170,0,290),Position=UDim2.new(0,100,0,100),BackgroundColor3=Color3.fromRGB(22,22,22),BorderSizePixel=0})
+Instance.new("UICorner",M).CornerRadius=UDim.new(0,8)
+
+-- Top Bar
+local Top=cr("Frame",M,{Size=UDim2.new(1,0,0,30),BackgroundColor3=sc,BorderSizePixel=0})
+Instance.new("UICorner",Top).CornerRadius=UDim.new(0,8)
+local Ttl=cr("TextLabel",Top,{Size=UDim2.new(1,-50,1,0),Position=UDim2.new(0,8,0,0),Text="Cypher Right",TextColor3=Color3.new(1,1,1),BackgroundTransparency=1,Font=Enum.Font.GothamBold,TextSize=13,TextXAlignment=Enum.TextXAlignment.Left})
+local Min=cr("TextButton",Top,{Size=UDim2.new(0,22,0,22),Position=UDim2.new(1,-48,0,4),Text="_",TextColor3=Color3.new(1,1,1),BackgroundColor3=Color3.fromRGB(255,255,255,0.2),BorderSizePixel=0,Font=Enum.Font.GothamBold,TextSize=14})Instance.new("UICorner",Min).CornerRadius=UDim.new(0,4)
+local Cls=cr("TextButton",Top,{Size=UDim2.new(0,22,0,22),Position=UDim2.new(1,-24,0,4),Text="x",TextColor3=Color3.new(1,1,1),BackgroundColor3=Color3.fromRGB(255,255,255,0.2),BorderSizePixel=0,Font=Enum.Font.GothamBold,TextSize=14})Instance.new("UICorner",Cls).CornerRadius=UDim.new(0,4)
+
+-- Tabs
+local TF=cr("Frame",M,{Size=UDim2.new(0,18,0,260),Position=UDim2.new(0,0,0,30),BackgroundColor3=Color3.fromRGB(30,30,30),BorderSizePixel=0})
+local tabs={"💼","🥊","🎄","⚙","🔄","💻"}
+local tabNames={"Cases","Battle","Xmas","Settings","Fuse","Local"}
+for i=1,#tabs do local t=cr("TextButton",TF,{Size=UDim2.new(1,0,0,24),Position=UDim2.new(0,0,0,(i-1)*26+2),Text=tabs[i],BackgroundColor3=i==1 and sc or Color3.fromRGB(40,40,40),TextColor3=Color3.new(1,1,1),BorderSizePixel=0,Font=Enum.Font.Gotham,TextSize=14})Instance.new("UICorner",t).CornerRadius=UDim.new(0,4)t.MouseButton1Click:Connect(function()sTab=tabNames[i]for _,v in TF:GetChildren()do if v:IsA("TextButton")then v.BackgroundColor3=Color3.fromRGB(40,40,40)end end t.BackgroundColor3=sc loadTab()end)end
+
+-- Content
+local PG=cr("Frame",M,{Size=UDim2.new(0,152,0,260),Position=UDim2.new(0,18,0,30),BackgroundColor3=Color3.fromRGB(32,32,32),BorderSizePixel=0})
+local PG2=cr("ScrollingFrame",PG,{Size=UDim2.new(1,0,1,0),CanvasSize=UDim2.new(0,0,0,800),BackgroundTransparency=1,BorderSizePixel=0,ScrollBarThickness=3})
+
+-- Functions
+function loadTab()for _,v in PG2:GetChildren()do v:Destroy()end
+if sTab=="Cases"then
+local l=cr("TextLabel",PG2,{Size=UDim2.new(1,0,0,16),Text="Select cases:",TextColor3=Color3.new(0.8,0.8,0.8),BackgroundTransparency=1,Font=Enum.Font.Gotham,TextSize=10,TextXAlignment=Enum.TextXAlignment.Left})
+for _,n in cases do local f,c=ck(n)f.Parent=PG2 c.MouseButton1Click:Connect(function()if c.Text=="✓"then c.Text=" "c.TextColor3=Color3.new(1,0,0)else c.Text="✓"c.TextColor3=Color3.new(0,1,0)end end)end
+local as=cr("TextButton",PG2,{Size=UDim2.new(1,-4,0,20),Text="Auto Sell: OFF",BackgroundColor3=Color3.fromRGB(60,20,20),TextColor3=Color3.new(1,1,1),BorderSizePixel=0,Font=Enum.Font.Gotham,TextSize=10})as.MouseButton1Click:Connect(function()autoSell=not autoSell as.Text=autoSell and"Auto Sell: ON"or"Auto Sell: OFF"as.BackgroundColor3=autoSell and Color3.fromRGB(20,80,20)or Color3.fromRGB(60,20,20)end)
+local fl=cr("TextBox",PG2,{Size=UDim2.new(1,-4,0,18),PlaceholderText="Fav items (comma)",Text="",BackgroundColor3=Color3.fromRGB(40,40,40),TextColor3=Color3.new(1,1,1),BorderSizePixel=0,Font=Enum.Font.Gotham,TextSize=10,ClearTextOnFocus=false})
+local af=cr("TextButton",PG2,{Size=UDim2.new(1,-4,0,20),Text="Auto Fuse: OFF",BackgroundColor3=Color3.fromRGB(60,20,20),TextColor3=Color3.new(1,1,1),BorderSizePixel=0,Font=Enum.Font.Gotham,TextSize=10})af.MouseButton1Click:Connect(function()autoFuse=not autoFuse af.Text=autoFuse and"Auto Fuse: ON"or"Auto Fuse: OFF"af.BackgroundColor3=autoFuse and Color3.fromRGB(20,80,20)or Color3.fromRGB(60,20,20)end)
+local st=cr("TextButton",PG2,{Size=UDim2.new(1,-4,0,24),Text="START",BackgroundColor3=Color3.fromRGB(0,120,0),TextColor3=Color3.new(1,1,1),BorderSizePixel=0,Font=Enum.Font.GothamBold,TextSize=12})st.MouseButton1Click:Connect(function()if not running then running=true st.Text="STOP"favList={}for v in fl.Text:gmatch("[^,]+")do table.insert(favList,v:match("^%s*(.-)%s*$"))end task.spawn(function()while running do local sel={}for _,v in PG2:GetChildren()do if v:IsA("Frame")and v:FindFirstChild("TextButton")and v.TextButton.Text=="✓"then table.insert(sel,v.TextLabel.Text)end end if#sel==0 then running=false st.Text="START"break end for _,cn in sel do if not running then break end local count=1 while count<=10 and running do local ok,items=ev.OpenCase:InvokeServer(cn,1)if ok then for _,it in items do local fav=false for _,fv in favList do if it:find(fv,1,true)then fav=true break end end if fav then ev.Favorite:InvokeServer(it,true)elseif autoSell then ev.Inventory:FireServer("Sell",it)end end end count=count+1 wait(math.random(0,200)/100)end if autoFuse then local cnt={}for _,it in inv:GetChildren()do if not it:GetAttribute("Unique")and not it:GetAttribute("Favorite")and inf.Gifts[it.Name]and inf.Gifts[it.Name].Price>=10000 then cnt[it.Name]=(cnt[it.Name]or 0)+1 end end for nm,cc in cnt do if cc>=5 then local its={}for _,it in inv:GetChildren()do if it.Name==nm and#its<5 then table.insert(its,it)end end ev.Fuse:InvokeServer("Fuse",its,false)break end end end end wait(0.1)end running=false st.Text="START"end)end end)
+elseif sTab=="Battle"then
+local l=cr("TextLabel",PG2,{Size=UDim2.new(1,0,0,16),Text="Select case:",TextColor3=Color3.new(0.8,0.8,0.8),BackgroundTransparency=1,Font=Enum.Font.Gotham,TextSize=10,TextXAlignment=Enum.TextXAlignment.Left})
+for _,n in cases do local b=cr("TextButton",PG2,{Size=UDim2.new(1,-4,0,18),Text=n,BackgroundColor3=Color3.fromRGB(40,40,40),TextColor3=Color3.new(1,1,1),BorderSizePixel=0,Font=Enum.Font.Gotham,TextSize=10})b.MouseButton1Click:Connect(function()selCase=n for _,v in PG2:GetChildren()do if v:IsA("TextButton")and v~=b then v.BackgroundColor3=Color3.fromRGB(40,40,40)end end b.BackgroundColor3=sc end)end
+local st=cr("TextButton",PG2,{Size=UDim2.new(1,-4,0,24),Text="START BATTLE",BackgroundColor3=Color3.fromRGB(0,120,0),TextColor3=Color3.new(1,1,1),BorderSizePixel=0,Font=Enum.Font.GothamBold,TextSize=12})st.MouseButton1Click:Connect(function()if not running and selCase~=""then running=true st.Text="STOP"task.spawn(function()while running do local ok,err=ev.Battles:InvokeServer("Create",{selCase,selCase,selCase,selCase,selCase,selCase,selCase,selCase,selCase,selCase},{})if ok then ev.Btl:Fire({selCase,selCase,selCase,selCase,selCase,selCase,selCase,selCase,selCase,selCase})ev.Battles:InvokeServer("CallABot")end wait(0.5)end running=false st.Text="START BATTLE"end)end end)
+elseif sTab=="Xmas"then
+local l=cr("TextLabel",PG2,{Size=UDim2.new(1,0,0,16),Text="Snowflakes: "..i._SnowflakesValue.Value,TextColor3=Color3.new(0.8,0.8,0.8),BackgroundTransparency=1,Font=Enum.Font.Gotham,TextSize=10,TextXAlignment=Enum.TextXAlignment.Left})
+for _,n in ngCases do local b=cr("TextButton",PG2,{Size=UDim2.new(1,-4,0,18),Text=n,BackgroundColor3=Color3.fromRGB(40,40,40),TextColor3=Color3.new(1,1,1),BorderSizePixel=0,Font=Enum.Font.Gotham,TextSize=10})b.MouseButton1Click:Connect(function()ev.GUI:Fire("CasePage",n)end)end
+local sw=cr("TextButton",PG2,{Size=UDim2.new(1,-4,0,24),Text="SPIN WHEEL",BackgroundColor3=Color3.fromRGB(120,0,120),TextColor3=Color3.new(1,1,1),BorderSizePixel=0,Font=Enum.Font.GothamBold,TextSize=12})sw.MouseButton1Click:Connect(function()i._ArcadeSpins.Value=999999 task.spawn(function()for j=1,100 do pcall(function()ev.Spin:InvokeServer("Spin")end)task.wait(0.3)end end)end)
+elseif sTab=="Settings"then
+local l=cr("TextLabel",PG2,{Size=UDim2.new(1,0,0,16),Text="Color theme:",TextColor3=Color3.new(0.8,0.8,0.8),BackgroundTransparency=1,Font=Enum.Font.Gotham,TextSize=10,TextXAlignment=Enum.TextXAlignment.Left})
+local cn={"Orange","Purple","Rasp","Green","Mint","Red","Black","Yell"}
+for i=1,#cn do local b=cr("TextButton",PG2,{Size=UDim2.new(1,-4,0,16),Text=cn[i],BackgroundColor3=col[cn[i]],TextColor3=Color3.new(1,1,1),BorderSizePixel=0,Font=Enum.Font.Gotham,TextSize=9})b.MouseButton1Click:Connect(function()sc=col[cn[i]]Top.BackgroundColor3=sc for _,v in TF:GetChildren()do if v:IsA("TextButton")and v.BackgroundColor3~=Color3.fromRGB(40,40,40)then v.BackgroundColor3=sc end end end)end
+local aa=cr("TextButton",PG2,{Size=UDim2.new(1,-4,0,20),Text="Anti AFK: ON",BackgroundColor3=Color3.fromRGB(20,80,20),TextColor3=Color3.new(1,1,1),BorderSizePixel=0,Font=Enum.Font.Gotham,TextSize=10})aa.MouseButton1Click:Connect(function()antiAfk=not antiAfk aa.Text=antiAfk and"Anti AFK: ON"or"Anti AFK: OFF"aa.BackgroundColor3=antiAfk and Color3.fromRGB(20,80,20)or Color3.fromRGB(60,20,20)end)
+elseif sTab=="Fuse"then
+local l=cr("TextLabel",PG2,{Size=UDim2.new(1,0,0,16),Text="Auto fuse all items",TextColor3=Color3.new(0.8,0.8,0.8),BackgroundTransparency=1,Font=Enum.Font.Gotham,TextSize=10,TextXAlignment=Enum.TextXAlignment.Left})
+local fu=cr("TextButton",PG2,{Size=UDim2.new(1,-4,0,24),Text="FUSE ALL",BackgroundColor3=Color3.fromRGB(120,80,0),TextColor3=Color3.new(1,1,1),BorderSizePixel=0,Font=Enum.Font.GothamBold,TextSize=12})fu.MouseButton1Click:Connect(function()task.spawn(function()while true do local cnt={}for _,it in inv:GetChildren()do if not it:GetAttribute("Unique")and not it:GetAttribute("Favorite")and inf.Gifts[it.Name]and inf.Gifts[it.Name].Price>=10000 then cnt[it.Name]=(cnt[it.Name]or 0)+1 end end local found=false for nm,cc in cnt do if cc>=5 then local its={}for _,it in inv:GetChildren()do if it.Name==nm and#its<5 then table.insert(its,it)end end ev.Fuse:InvokeServer("Fuse",its,false)found=true break end end if not found then break end wait(0.3)end end)end)
+elseif sTab=="Local"then
+local l=cr("TextLabel",PG2,{Size=UDim2.new(1,0,0,16),Text="Luck/Blessing:",TextColor3=Color3.new(0.8,0.8,0.8),BackgroundTransparency=1,Font=Enum.Font.Gotham,TextSize=10,TextXAlignment=Enum.TextXAlignment.Left})
+local lx2=cr("TextButton",PG2,{Size=UDim2.new(1,-4,0,18),Text="x2 Luck: OFF",BackgroundColor3=Color3.fromRGB(40,40,40),TextColor3=Color3.new(1,1,1),BorderSizePixel=0,Font=Enum.Font.Gotham,TextSize=10})lx2.MouseButton1Click:Connect(function()if i._LuckyPotion.Value==0 then i._LuckyPotion.Value=99999 lx2.Text="x2 Luck: ON"else i._LuckyPotion.Value=0 lx2.Text="x2 Luck: OFF"end end)
+local lx4=cr("TextButton",PG2,{Size=UDim2.new(1,-4,0,18),Text="x4 Luck: OFF",BackgroundColor3=Color3.fromRGB(40,40,40),TextColor3=Color3.new(1,1,1),BorderSizePixel=0,Font=Enum.Font.Gotham,TextSize=10})lx4.MouseButton1Click:Connect(function()if i._LuckyPotion2.Value==0 then i._LuckyPotion2.Value=99999 lx4.Text="x4 Luck: ON"else i._LuckyPotion2.Value=0 lx4.Text="x4 Luck: OFF"end end)
+local bs=cr("TextButton",PG2,{Size=UDim2.new(1,-4,0,18),Text="Blessing: OFF",BackgroundColor3=Color3.fromRGB(40,40,40),TextColor3=Color3.new(1,1,1),BorderSizePixel=0,Font=Enum.Font.Gotham,TextSize=10})bs.MouseButton1Click:Connect(function()if u.CrossValue.Value==0 then u.CrossValue.Value=99999 bs.Text="Blessing: ON"else u.CrossValue.Value=0 bs.Text="Blessing: OFF"end end)
+local bd=cr("TextButton",PG2,{Size=UDim2.new(1,-4,0,18),Text="Best Drop: "..i._BestDrop.Value,BackgroundColor3=Color3.fromRGB(40,40,40),TextColor3=Color3.new(1,1,1),BorderSizePixel=0,Font=Enum.Font.Gotham,TextSize=9})bd.MouseButton1Click:Connect(function()local it=""for n in inf.Gifts do it=n break end i._BestDrop.Value=it bd.Text="Best Drop: "..it end)
+local bs2=cr("TextButton",PG2,{Size=UDim2.new(1,-4,0,18),Text="Stars: "..i._StarsValue.Value,BackgroundColor3=Color3.fromRGB(40,40,40),TextColor3=Color3.new(1,1,1),BorderSizePixel=0,Font=Enum.Font.Gotham,TextSize=10})bs2.MouseButton1Click:Connect(function()i._StarsValue.Value=i._StarsValue.Value+1000000 bs2.Text="Stars: "..i._StarsValue.Value end)
+local bt=cr("TextButton",PG2,{Size=UDim2.new(1,-4,0,18),Text="TON: "..i._TONValue.Value,BackgroundColor3=Color3.fromRGB(40,40,40),TextColor3=Color3.new(1,1,1),BorderSizePixel=0,Font=Enum.Font.Gotham,TextSize=10})bt.MouseButton1Click:Connect(function()i._TONValue.Value=i._TONValue.Value+1000 bt.Text="TON: "..i._TONValue.Value end)
+local bg=cr("TextButton",PG2,{Size=UDim2.new(1,-4,0,18),Text="Gems: "..i._GemsValue.Value,BackgroundColor3=Color3.fromRGB(40,40,40),TextColor3=Color3.new(1,1,1),BorderSizePixel=0,Font=Enum.Font.Gotham,TextSize=10})bg.MouseButton1Click:Connect(function()i._GemsValue.Value=i._GemsValue.Value+1000 bg.Text="Gems: "..i._GemsValue.Value end)
+local bf=cr("TextButton",PG2,{Size=UDim2.new(1,-4,0,18),Text="Fast Upgrade: OFF",BackgroundColor3=Color3.fromRGB(40,40,40),TextColor3=Color3.new(1,1,1),BorderSizePixel=0,Font=Enum.Font.Gotham,TextSize=10})bf.MouseButton1Click:Connect(function()if i._1628441770.Value==0 then i._1628441770.Value=1 bf.Text="Fast Upgrade: ON"else i._1628441770.Value=0 bf.Text="Fast Upgrade: OFF"end end)
+local bp=cr("TextButton",PG2,{Size=UDim2.new(1,-4,0,18),Text="Open Battlepass",BackgroundColor3=Color3.fromRGB(40,40,40),TextColor3=Color3.new(1,1,1),BorderSizePixel=0,Font=Enum.Font.Gotham,TextSize=10})bp.MouseButton1Click:Connect(function()ev.GUI:Fire("OpenPage","Battlepass")end)
+local ix=cr("TextButton",PG2,{Size=UDim2.new(1,-4,0,18),Text="Fill Index",BackgroundColor3=Color3.fromRGB(40,40,40),TextColor3=Color3.new(1,1,1),BorderSizePixel=0,Font=Enum.Font.Gotham,TextSize=10})ix.MouseButton1Click:Connect(function()for _,v in i._Index:GetChildren()do v.Value=v.Value+10 end end)
+end PG2.CanvasSize=UDim2.new(0,0,0,PG2:GetChildren()[#PG2:GetChildren()]and PG2:GetChildren()[#PG2:GetChildren()].AbsolutePosition.Y-30 or 0)end
+
+-- Drag
+local drag=false local dS local dP
+Top.InputBegan:Connect(function(input)if input.UserInputType==Enum.UserInputType.MouseButton1 or input.UserInputType==Enum.UserInputType.Touch then drag=true dS=input.Position dP=M.Position input.Changed:Connect(function()if input.UserInputState==Enum.UserInputState.End then drag=false end end)end end)
+uis.InputChanged:Connect(function(input)if drag and(input.UserInputType==Enum.UserInputType.MouseMovement or input.UserInputType==Enum.UserInputType.Touch)then local delta=input.Position-dS M.Position=UDim2.new(dP.X.Scale,dP.X.Offset+delta.X,dP.Y.Scale,dP.Y.Offset+delta.Y)end end)
+
+-- Minimize/Restore
+Min.MouseButton1Click:Connect(function()min=not min if min then PG.Visible=false TF.Visible=false M.Size=UDim2.new(0,170,0,30)else PG.Visible=true TF.Visible=true M.Size=UDim2.new(0,170,0,290)end end)
+Cls.MouseButton1Click:Connect(function()running=false gui:Destroy()end)
+
+-- Anti AFK
+task.spawn(function()while gui and gui.Parent do if antiAfk then local v=Instance.new("VirtualUser")v:SetKeyDown("w")wait(0.1)v:SetKeyUp("w")end wait(120)end end)
+
+loadTab()
